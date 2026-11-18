@@ -3,135 +3,314 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Scattergories with Friends</title>
+<meta name="theme-color" content="#2b3be0">
+<title>Game Night</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%2317183b'/%3E%3Ctext x='50' y='72' font-size='64' text-anchor='middle' fill='%23ffd23f' font-family='sans-serif' font-weight='800'%3EG%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #fbf6ee; --card: #ffffff; --ink: #2a2522; --muted: #8a8079;
-    --accent: #e8572a; --accent-2: #2a7de1; --good: #2f9e5b; --bad: #d64545;
-    --line: #ece4d8; --chip: #f4ede2; --radius: 14px;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0; font-family: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    background: var(--bg); color: var(--ink); -webkit-font-smoothing: antialiased;
-  }
-  #app { max-width: 760px; margin: 0 auto; padding: 16px 16px 120px; }
-  h1 { font-size: 44px; margin: 0 0 4px; letter-spacing: -1px; }
-  h1 span { color: var(--accent); }
-  h2 { margin: 18px 0 8px; font-size: 22px; }
-  h3 { margin: 0 0 8px; font-size: 16px; }
-  .sub { color: var(--muted); margin: 0 0 24px; }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; box-shadow: 0 2px 10px rgba(60,40,20,.05); }
-  .home { max-width: 420px; margin: 8vh auto 0; }
-  label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 14px; }
-  input, select {
-    font: inherit; width: 100%; padding: 12px 14px; border: 2px solid var(--line); border-radius: 10px;
-    background: #fff; color: var(--ink); outline: none; margin-top: 6px;
-  }
-  input:focus, select:focus { border-color: var(--accent-2); }
-  input:disabled { background: #f6f2ec; color: var(--muted); }
-  button {
-    font: inherit; font-weight: 700; border: 0; border-radius: 10px; padding: 12px 18px; cursor: pointer;
-    background: var(--chip); color: var(--ink); transition: transform .05s, filter .15s;
-  }
-  button:hover { filter: brightness(.97); }
-  button:active { transform: scale(.98); }
-  button.primary { background: var(--accent); color: #fff; width: 100%; font-size: 17px; padding: 14px; }
-  button.small { padding: 6px 12px; font-size: 13px; }
-  button:disabled { opacity: .5; cursor: default; }
-  .row { display: flex; gap: 8px; align-items: stretch; }
-  .row input { margin-top: 0; }
-  .or { text-align: center; color: var(--muted); margin: 16px 0 10px; font-size: 14px; }
-  .code-in { text-transform: uppercase; letter-spacing: 4px; font-weight: 700; text-align: center; }
-  .err { color: var(--bad); font-weight: 600; }
-  .link { background: none; padding: 8px 0 0; color: var(--muted); font-weight: 500; text-decoration: underline; font-size: 14px; }
+:root {
+  --cobalt: #2b3be0; --cobalt-deep: #1d28a6; --ink: #17183b; --paper: #ffffff;
+  --pink: #ff6fb5; --sun: #ffd23f; --mint: #3ddc97; --tomato: #ff5a4f; --fog: #eef0ff; --muted: #6b6f93;
+  --r-lg: 22px; --r-md: 14px; --r-sm: 10px;
+  --font: "Bricolage Grotesque", ui-rounded, "Avenir Next", "Segoe UI", system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; min-height: 100vh; font-family: var(--font); color: var(--ink); font-size: 16px; line-height: 1.4;
+  background-color: var(--cobalt);
+  background-image: radial-gradient(rgba(255,255,255,.13) 1.4px, transparent 1.6px);
+  background-size: 18px 18px; -webkit-font-smoothing: antialiased;
+}
+#app { max-width: 1120px; margin: 0 auto; padding: 14px 16px 120px; }
+h1, h2, h3 { margin: 0; line-height: 1.1; }
+h2 { font-size: 24px; font-weight: 800; letter-spacing: -.3px; }
+h3 { font-size: 17px; font-weight: 750; }
+p { margin: 0; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
 
-  .topbar { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; font-size: 14px; color: var(--muted); }
-  .topbar b { color: var(--ink); letter-spacing: 2px; }
-  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 12px; }
-  .chip { background: var(--chip); border-radius: 999px; padding: 6px 12px; font-size: 14px; font-weight: 600; }
-  .chip.me { outline: 2px solid var(--accent-2); }
-  .chip.off { opacity: .45; }
-  .chip.done { background: #dff3e6; color: var(--good); }
-  .chip small { font-weight: 500; color: var(--muted); }
+/* ---------- surfaces ---------- */
+.card { background: var(--paper); border: 3px solid var(--ink); border-radius: var(--r-lg); box-shadow: 7px 7px 0 var(--pink); padding: 20px; }
+.card.flat { box-shadow: 4px 4px 0 var(--ink); }
+.muted { color: var(--muted); }
+.small { font-size: 14px; }
+.stack > * + * { margin-top: 12px; }
 
-  .invite { display: flex; gap: 8px; align-items: center; background: var(--chip); border-radius: 10px; padding: 10px 12px; margin: 10px 0; }
-  .invite code { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
-  .settings { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 12px 0 18px; }
-  .settings label { margin: 0; font-size: 13px; }
-  .settings .val { font-size: 20px; font-weight: 700; margin-top: 6px; }
-  .waiting { text-align: center; color: var(--muted); padding: 14px; }
+/* ---------- buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 3px solid var(--ink); border-radius: var(--r-md);
+  padding: 11px 18px; font-weight: 750; background: var(--paper); color: var(--ink); cursor: pointer; box-shadow: 3px 3px 0 var(--ink);
+  transition: transform .06s ease, box-shadow .06s ease; text-decoration: none; white-space: nowrap;
+}
+.btn:hover { background: var(--fog); }
+.btn:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--ink); }
+.btn:disabled { opacity: .45; cursor: default; transform: none; box-shadow: 3px 3px 0 var(--ink); }
+.btn.primary { background: var(--sun); font-size: 18px; padding: 14px 22px; }
+.btn.primary:hover { background: #ffdc66; }
+.btn.good { background: var(--mint); }
+.btn.wide { width: 100%; }
+.btn.sm { padding: 6px 11px; font-size: 14px; border-width: 2.5px; box-shadow: 2px 2px 0 var(--ink); border-radius: var(--r-sm); }
+.btn.sm:active { transform: translate(2px, 2px); }
+.btn.ghost { background: transparent; color: #fff; border-color: rgba(255,255,255,.75); box-shadow: none; }
+.btn.ghost:hover { background: rgba(255,255,255,.12); }
+.iconbtn { width: 40px; height: 40px; padding: 0; border-radius: 12px; }
 
-  .stage { display: flex; align-items: center; justify-content: center; gap: 22px; margin: 6px 0 10px; }
-  .letter {
-    width: 96px; height: 96px; border-radius: 22px; background: var(--ink); color: #fff; font-size: 60px; font-weight: 800;
-    display: grid; place-items: center; box-shadow: 0 6px 0 #00000022; transform: rotate(-4deg);
-  }
-  .timer { font-size: 44px; font-weight: 800; font-variant-numeric: tabular-nums; min-width: 120px; text-align: center; }
-  .timer.low { color: var(--bad); }
-  .timer.over { color: var(--muted); font-size: 26px; }
-  ol.answers { list-style: none; padding: 0; margin: 0; counter-reset: c; }
-  ol.answers li { counter-increment: c; margin-bottom: 10px; }
-  ol.answers label { margin: 0; font-weight: 600; font-size: 14px; }
-  ol.answers label::before { content: counter(c) ". "; color: var(--accent); }
-  .hint { color: var(--muted); font-size: 14px; text-align: center; margin: 8px 0 14px; }
-  .overlay { position: fixed; inset: 0; background: rgba(251,246,238,.92); display: grid; place-items: center; z-index: 10; text-align: center; }
-  .overlay .big { font-size: 120px; font-weight: 800; color: var(--accent); line-height: 1; }
+/* ---------- inputs ---------- */
+label.field { display: block; font-weight: 700; font-size: 14px; }
+.input, select.input, textarea.input {
+  display: block; width: 100%; margin-top: 6px; padding: 12px 14px; border: 3px solid var(--ink); border-radius: var(--r-md);
+  background: #fff; outline: none; font-size: 16px;
+}
+.input:focus { box-shadow: 0 0 0 3px var(--sun); }
+.input:disabled { background: var(--fog); color: var(--muted); }
+textarea.input { resize: vertical; min-height: 70px; }
 
-  .cat { margin-bottom: 14px; }
-  .ans { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; align-items: center; padding: 10px 12px; border-radius: 10px; background: #f8f4ee; margin-bottom: 6px; border-left: 4px solid var(--good); }
-  .ans.invalid { border-left-color: var(--bad); }
-  .ans.dup { border-left-color: #c9a227; }
-  .ans.empty { border-left-color: var(--line); opacity: .55; }
-  .ans .txt { font-weight: 700; font-size: 17px; word-break: break-word; }
-  .ans.invalid .txt, .ans.dup .txt { text-decoration: line-through; text-decoration-thickness: 2px; }
-  .ans .who { font-size: 13px; color: var(--muted); }
-  .tag { display: inline-block; font-size: 11px; font-weight: 700; border-radius: 6px; padding: 2px 6px; margin-left: 6px; vertical-align: middle; text-decoration: none; }
-  .tag.dup { background: #fbefc6; color: #8a6d00; }
-  .tag.wrong { background: #fde2e2; color: var(--bad); }
-  .tag.pt { background: #dff3e6; color: var(--good); }
-  .tag.zero { background: #eee; color: var(--muted); }
-  .votes { display: flex; gap: 6px; grid-row: span 2; }
-  .votes button { padding: 8px 10px; font-size: 15px; background: #fff; border: 2px solid var(--line); min-width: 54px; }
-  .votes button.on.up { border-color: var(--good); background: #e9f7ee; }
-  .votes button.on.down { border-color: var(--bad); background: #fdeaea; }
-  .votes .mine { font-size: 12px; color: var(--muted); align-self: center; }
+/* ---------- top bar ---------- */
+.topbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; color: #fff; }
+.brand { font-weight: 800; font-size: 20px; letter-spacing: -.4px; text-shadow: 2px 2px 0 var(--pink); margin-right: 4px; }
+.roompill { background: #fff; color: var(--ink); border: 3px solid var(--ink); border-radius: 999px; padding: 4px 12px; font-weight: 800; letter-spacing: 3px; }
+.topbar .spacer { flex: 1; }
+.roundinfo { font-weight: 700; }
 
-  .dock { position: fixed; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,.96); border-top: 1px solid var(--line); padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); z-index: 5; }
-  .dock .inner { max-width: 760px; margin: 0 auto; display: flex; gap: 10px; align-items: center; }
-  .dock .status { flex: 1; font-size: 14px; color: var(--muted); }
-  .dock button.go { background: var(--accent); color: #fff; }
-  .dock button.go.isdone { background: var(--good); }
+/* ---------- home ---------- */
+.home { display: grid; gap: 28px; padding-top: 4vh; }
+.wordmark {
+  font-size: clamp(64px, 13vw, 148px); font-weight: 800; color: #fff; letter-spacing: -4px; line-height: .86;
+  text-shadow: 6px 6px 0 var(--pink); font-variation-settings: "opsz" 96;
+}
+.tagline { color: #fff; font-size: 19px; max-width: 34ch; margin-top: 14px; opacity: .92; }
+.home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; align-items: start; }
+.or { text-align: center; color: var(--muted); margin: 4px 0; font-size: 14px; }
+.joinrow { display: flex; gap: 10px; }
+.joinrow .input { margin-top: 0; text-transform: uppercase; letter-spacing: 6px; font-weight: 800; text-align: center; }
+.err { color: var(--tomato); font-weight: 700; }
 
-  table { width: 100%; border-collapse: collapse; }
-  td, th { padding: 10px 8px; text-align: left; border-bottom: 1px solid var(--line); }
-  th { font-size: 13px; color: var(--muted); font-weight: 600; }
-  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
-  .trophy { font-size: 64px; text-align: center; margin-top: 10px; }
-  .winner { text-align: center; font-size: 26px; font-weight: 800; margin-bottom: 14px; }
-  .setup { max-width: 560px; margin: 8vh auto; line-height: 1.5; }
-  .setup code { background: var(--chip); padding: 2px 6px; border-radius: 6px; }
-  @media (max-width: 520px) {
-    h1 { font-size: 36px; }
-    .letter { width: 76px; height: 76px; font-size: 46px; }
-    .timer { font-size: 36px; }
-    .settings { grid-template-columns: 1fr 1fr 1fr; }
-  }
+/* ---------- avatar builder ---------- */
+.av { display: inline-block; flex: none; }
+.av svg { display: block; width: 100%; height: 100%; }
+.avbuilder { display: grid; grid-template-columns: 150px 1fr; gap: 18px; align-items: center; }
+.avbuilder .preview { width: 150px; height: 150px; background: var(--fog); border: 3px solid var(--ink); border-radius: 50%; padding: 8px; }
+.avrows { display: grid; gap: 8px; }
+.avrow { display: grid; grid-template-columns: 64px 40px 1fr 40px; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; }
+.avrow .val { text-align: center; color: var(--muted); font-size: 13px; }
+.swatches { display: flex; flex-wrap: wrap; gap: 6px; }
+.swatch { width: 26px; height: 26px; border-radius: 50%; border: 2.5px solid var(--ink); cursor: pointer; padding: 0; }
+.swatch[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--sun); }
+
+/* ---------- lobby ---------- */
+.lobby { display: grid; grid-template-columns: 340px 1fr; gap: 26px; align-items: start; }
+.plist { display: grid; gap: 8px; margin-top: 14px; }
+.prow { display: flex; align-items: center; gap: 12px; padding: 6px 8px; border-radius: var(--r-md); }
+.prow.me { background: var(--fog); }
+.prow.off { opacity: .45; }
+.prow .name { font-weight: 750; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.prow .tag { font-size: 12px; font-weight: 700; color: var(--muted); }
+.invite { display: flex; gap: 8px; align-items: center; background: var(--fog); border-radius: var(--r-md); padding: 8px 8px 8px 12px; margin-top: 16px; }
+.invite span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; }
+.games { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 16px 0 20px; }
+.gametile {
+  text-align: left; border: 3px solid var(--ink); border-radius: var(--r-lg); padding: 16px; background: #fff; cursor: pointer;
+  display: grid; gap: 6px; box-shadow: 3px 3px 0 var(--ink); position: relative;
+}
+.gametile[disabled] { cursor: default; }
+.gametile .gt-title { font-size: 21px; font-weight: 800; letter-spacing: -.3px; }
+.gametile .gt-desc { font-size: 14px; color: var(--muted); }
+.gametile .gt-art { height: 64px; display: flex; align-items: center; gap: 6px; }
+.gametile[aria-pressed="true"] { background: var(--sun); box-shadow: 5px 5px 0 var(--pink); }
+.gametile[aria-pressed="true"] .gt-desc { color: var(--ink); }
+.mini-die { width: 46px; height: 46px; border-radius: 12px; background: var(--ink); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 28px; transform: rotate(-6deg); }
+.mini-die:nth-child(2) { transform: rotate(5deg); background: var(--pink); color: var(--ink); }
+.settings { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.settings .val { font-size: 22px; font-weight: 800; margin-top: 6px; }
+.waiting { text-align: center; color: var(--muted); padding: 14px; font-weight: 600; }
+
+/* ---------- timer ring ---------- */
+.ring { position: relative; width: 74px; height: 74px; flex: none; }
+.ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring .track { fill: #fff; stroke: var(--fog); stroke-width: 7; }
+.ring .bar { fill: none; stroke: var(--mint); stroke-width: 7; stroke-linecap: round; transition: stroke-dashoffset .25s linear; }
+.ring.low .bar { stroke: var(--tomato); }
+.ring .t { position: absolute; inset: 0; display: grid; place-items: center; font-weight: 800; font-size: 19px; font-variant-numeric: tabular-nums; }
+.ring.low .t { color: var(--tomato); }
+
+/* ---------- scattergories ---------- */
+.stage { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+.die {
+  width: 104px; height: 104px; border-radius: 26px; background: var(--ink); color: #fff; font-size: 66px; font-weight: 800;
+  display: grid; place-items: center; box-shadow: 6px 6px 0 var(--pink); transform: rotate(-5deg); flex: none;
+}
+.die.rolling { animation: wobble .18s infinite alternate; }
+.die.landed { animation: land .5s cubic-bezier(.2,1.6,.4,1); }
+@keyframes wobble { from { transform: rotate(-9deg) scale(.96); } to { transform: rotate(7deg) scale(1.04); } }
+@keyframes land { from { transform: rotate(40deg) scale(.4); } to { transform: rotate(-5deg) scale(1); } }
+.progress { display: flex; flex-wrap: wrap; gap: 8px; flex: 1; }
+.chip { display: inline-flex; align-items: center; gap: 6px; background: #fff; border: 2.5px solid var(--ink); border-radius: 999px; padding: 3px 10px 3px 4px; font-weight: 700; font-size: 14px; }
+.chip.me { background: var(--sun); }
+.chip.off { opacity: .45; }
+.chip.done { background: var(--mint); }
+.chip small { font-weight: 600; color: var(--muted); }
+.chip.me small, .chip.done small { color: var(--ink); }
+.answers { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 14px 20px; counter-reset: c; }
+.answers li { counter-increment: c; }
+.answers label { font-weight: 750; font-size: 15px; }
+.answers label::before { content: counter(c) ". "; color: var(--cobalt); }
+.hint { color: #fff; text-align: center; margin: 16px 0 0; font-weight: 600; opacity: .9; }
+.overlay { position: fixed; inset: 0; background: rgba(29,40,166,.82); display: grid; place-items: center; z-index: 40; text-align: center; color: #fff; }
+.overlay .big { font-size: 150px; font-weight: 800; line-height: 1; text-shadow: 6px 6px 0 var(--pink); }
+
+.cat { padding: 16px; }
+.cat + .cat { margin-top: 18px; }
+.cat h3 { margin-bottom: 10px; }
+.ans { display: grid; grid-template-columns: 150px 1fr auto; gap: 6px 14px; align-items: center; padding: 10px 12px; border-radius: var(--r-md); background: var(--fog); border-left: 7px solid var(--mint); }
+.ans + .ans { margin-top: 8px; }
+.ans.invalid { border-left-color: var(--tomato); }
+.ans.dup { border-left-color: var(--sun); }
+.ans.empty { border-left-color: #cfd2ee; opacity: .6; padding: 6px 12px; }
+.ans .who { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; min-width: 0; }
+.ans .who span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ans .txt { font-weight: 800; font-size: 19px; word-break: break-word; }
+.ans.invalid .txt, .ans.dup .txt { text-decoration: line-through; text-decoration-thickness: 3px; }
+.tag { display: inline-block; font-size: 12px; font-weight: 800; border-radius: 6px; padding: 2px 7px; margin-left: 6px; vertical-align: 3px; border: 2px solid var(--ink); background: #fff; }
+.tag.dup { background: var(--sun); }
+.tag.wrong { background: #ffd4d1; }
+.tag.pt { background: var(--mint); }
+.votes { display: flex; gap: 8px; }
+.vote { min-width: 62px; padding: 7px 10px; font-size: 16px; font-weight: 800; }
+.vote.on.up { background: var(--mint); }
+.vote.on.down { background: var(--tomato); color: #fff; }
+.mine { font-size: 13px; font-weight: 700; color: var(--muted); }
+.voters { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; }
+.voter { color: var(--ink); display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700; padding: 2px 8px 2px 2px; border-radius: 999px; }
+.voter.up { background: #c9f5df; }
+.voter.down { background: #ffd4d1; }
+.dock { position: fixed; left: 0; right: 0; bottom: 0; background: #fff; border-top: 3px solid var(--ink); padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); z-index: 20; }
+.dock .inner { max-width: 1120px; margin: 0 auto; display: flex; gap: 12px; align-items: center; }
+.dock .status { flex: 1; font-size: 15px; min-width: 0; }
+.dock .clock { font-weight: 800; font-variant-numeric: tabular-nums; }
+.dock .clock.low { color: var(--tomato); }
+
+/* ---------- scores / final ---------- */
+.scoretable { width: 100%; border-collapse: collapse; margin-top: 10px; }
+.scoretable td { padding: 9px 6px; border-bottom: 2px solid var(--fog); vertical-align: middle; }
+.scoretable .num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 800; white-space: nowrap; }
+.scoretable .plus { color: #1f9e5a; }
+.pcell { display: flex; align-items: center; gap: 10px; font-weight: 750; }
+.bar { height: 10px; background: var(--fog); border-radius: 99px; overflow: hidden; min-width: 60px; }
+.bar i { display: block; height: 100%; background: var(--cobalt); border-radius: 99px; }
+.podium { display: flex; justify-content: center; align-items: flex-end; gap: 14px; margin: 10px 0 22px; }
+.pod { display: grid; justify-items: center; gap: 8px; width: 130px; }
+.pod .block { width: 100%; border: 3px solid var(--ink); border-radius: 14px 14px 0 0; display: grid; place-items: center; font-size: 34px; font-weight: 800; }
+.pod.p1 .block { height: 130px; background: var(--sun); }
+.pod.p2 .block { height: 96px; background: #fff; }
+.pod.p3 .block { height: 72px; background: var(--pink); }
+.pod .pname { font-weight: 800; text-align: center; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pod .pts { font-size: 14px; font-weight: 700; color: var(--muted); }
+.winner { text-align: center; font-size: clamp(30px, 6vw, 48px); font-weight: 800; letter-spacing: -1px; margin-bottom: 6px; }
+
+/* ---------- sketch & guess ---------- */
+.dhead { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 16px; padding: 10px 16px; margin-bottom: 16px; }
+.hintword { text-align: center; font-size: clamp(22px, 4vw, 34px); font-weight: 800; letter-spacing: 6px; overflow-wrap: anywhere; }
+.hintword small { display: block; letter-spacing: 0; font-size: 14px; color: var(--muted); font-weight: 600; margin-top: 2px; }
+.dgrid { display: grid; grid-template-columns: 210px minmax(0, 1fr) 290px; gap: 16px; align-items: start; }
+.dplayers { padding: 10px; display: grid; gap: 4px; }
+.dp { display: flex; align-items: center; gap: 8px; padding: 6px; border-radius: 12px; }
+.dp.me { background: var(--fog); }
+.dp.got { background: #c9f5df; }
+.dp.drawing { background: var(--sun); }
+.dp.off { opacity: .45; }
+.dp .info { flex: 1; min-width: 0; }
+.dp .nm { font-weight: 750; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dp .sc { font-size: 13px; color: var(--muted); font-weight: 650; }
+.dp .st { font-size: 18px; }
+.canvasbox { position: relative; border: 3px solid var(--ink); border-radius: var(--r-lg); overflow: hidden; background: #fff; box-shadow: 7px 7px 0 var(--pink); aspect-ratio: 4 / 3; }
+.canvasbox canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+.canvasbox.can-draw canvas { cursor: crosshair; }
+.cvov { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(23,24,59,.78); color: #fff; text-align: center; padding: 20px; }
+.cvov[hidden] { display: none; }
+.cvov h2 { font-size: clamp(22px, 4vw, 34px); margin-bottom: 14px; }
+.choices { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+.reveal-word { display: inline-block; background: var(--sun); color: var(--ink); padding: 4px 14px; border-radius: 12px; border: 3px solid var(--ink); }
+.turnpts { display: grid; gap: 4px; margin-top: 14px; font-weight: 700; min-width: 220px; }
+.turnpts div { display: flex; justify-content: space-between; gap: 18px; }
+.tools { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 16px; padding: 10px; }
+.tools[hidden] { display: none; }
+.palette { display: grid; grid-template-columns: repeat(7, 26px); gap: 5px; }
+.pcol { width: 26px; height: 26px; border-radius: 7px; border: 2.5px solid var(--ink); cursor: pointer; padding: 0; }
+.pcol[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--sun); transform: scale(1.12); }
+.sizes, .toolset { display: flex; gap: 6px; }
+.tbtn { width: 42px; height: 42px; display: grid; place-items: center; border: 2.5px solid var(--ink); border-radius: 11px; background: #fff; cursor: pointer; font-size: 18px; padding: 0; }
+.tbtn[aria-pressed="true"] { background: var(--sun); }
+.tbtn .dot { background: var(--ink); border-radius: 50%; }
+.react { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 14px; color: #fff; font-weight: 700; }
+.react[hidden] { display: none; }
+.chat { display: flex; flex-direction: column; padding: 0; overflow: hidden; height: min(560px, 70vh); }
+.chatlog { flex: 1; overflow-y: auto; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.cm { display: flex; gap: 6px; align-items: flex-start; overflow-wrap: anywhere; }
+.cm b { font-weight: 800; }
+.cm.sys { color: var(--muted); font-style: italic; justify-content: center; text-align: center; }
+.cm.good { color: #13804a; font-weight: 800; justify-content: center; text-align: center; background: #c9f5df; border-radius: 8px; padding: 4px; }
+.cm.hidden { background: #e3f9ee; border-radius: 8px; padding: 3px 6px; }
+.chatform { border-top: 3px solid var(--ink); display: flex; }
+.chatform input { flex: 1; border: 0; padding: 14px; outline: none; min-width: 0; font-size: 16px; }
+.chatform input:disabled { background: var(--fog); }
+
+/* ---------- modal / toast ---------- */
+.modal { position: fixed; inset: 0; background: rgba(23,24,59,.6); display: grid; place-items: center; z-index: 60; padding: 16px; }
+.modal .card { width: min(560px, 100%); }
+.toasts { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 80; display: grid; gap: 8px; pointer-events: none; }
+.toast { background: var(--ink); color: #fff; padding: 10px 16px; border-radius: 12px; font-weight: 700; box-shadow: 4px 4px 0 var(--pink); animation: toastin .25s ease-out; }
+.toast.good { background: var(--mint); color: var(--ink); border: 3px solid var(--ink); }
+@keyframes toastin { from { transform: translateY(-12px); opacity: 0; } to { transform: none; opacity: 1; } }
+.pop { animation: pop .35s cubic-bezier(.2,1.5,.4,1); }
+@keyframes pop { from { transform: scale(.92); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* ---------- responsive ---------- */
+@media (max-width: 980px) {
+  .dgrid { grid-template-columns: minmax(0, 1fr); }
+  .dplayers { grid-auto-flow: column; grid-auto-columns: max-content; overflow-x: auto; order: -1; }
+  .dp .sc { display: none; }
+  .chat { height: 300px; }
+}
+@media (max-width: 820px) {
+  .home-grid, .lobby { grid-template-columns: 1fr; }
+  .answers { grid-template-columns: 1fr; }
+  .ans { grid-template-columns: 1fr auto; }
+  .ans .who { grid-column: 1 / -1; }
+}
+@media (max-width: 520px) {
+  #app { padding: 10px 12px 120px; }
+  .card { padding: 16px; box-shadow: 5px 5px 0 var(--pink); }
+  .games { grid-template-columns: 1fr; }
+  .avbuilder { grid-template-columns: 1fr; justify-items: center; }
+  .avrows { width: 100%; }
+  .die { width: 80px; height: 80px; font-size: 50px; }
+  .dhead { grid-template-columns: auto 1fr; }
+  .dhead .roundinfo { display: none; }
+  .pod { width: 96px; }
+  .overlay .big { font-size: 110px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
 </style>
 </head>
 <body>
 <div id="app"></div>
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, onValue, set, update, get, onDisconnect, serverTimestamp }
+import { getDatabase, ref, onValue, set, update, get, push, remove, onDisconnect, serverTimestamp,
+  query, limitToLast, onChildAdded, onChildChanged, onChildRemoved }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-/* =====================================================================
-   PASTE YOUR FIREBASE CONFIG HERE
-   (Firebase console → Project settings → Your apps → Web app → Config)
-   Make sure it includes databaseURL.
-   ===================================================================== */
+const WORDS = ("apple,banana,pizza,hamburger,hot dog,taco,donut,cupcake,ice cream,popcorn,cookie,cheese,egg,carrot,broccoli,pineapple,watermelon,cherry,lemon,grapes,sandwich,spaghetti,sushi,pancake,bacon,pretzel,cactus,flower,tree,palm tree,mushroom,leaf,rainbow,sun,moon,star,cloud,lightning,snowman,volcano,mountain,island,beach,waterfall,river,desert,igloo,castle,house,bridge,lighthouse,skyscraper,tent,windmill,pyramid,church,barn,garage,school,hospital," +
+"dog,cat,fish,shark,whale,dolphin,octopus,crab,turtle,frog,snake,lizard,dinosaur,dragon,unicorn,horse,cow,pig,sheep,chicken,duck,penguin,owl,eagle,parrot,flamingo,bat,bee,butterfly,spider,ant,snail,ladybug,mouse,rabbit,squirrel,fox,wolf,bear,panda,koala,kangaroo,monkey,gorilla,elephant,giraffe,zebra,lion,tiger,camel,hippo,rhino,crocodile,jellyfish,starfish,seahorse,peacock,hedgehog,sloth,raccoon,skunk,deer," +
+"car,bus,train,airplane,helicopter,rocket,boat,sailboat,submarine,bicycle,motorcycle,skateboard,scooter,tractor,ambulance,fire truck,police car,taxi,hot air balloon,parachute,traffic light,stop sign,anchor,wheel," +
+"guitar,piano,drum,trumpet,violin,microphone,headphones,camera,television,computer,laptop,phone,keyboard,mouse trap,robot,light bulb,battery,magnet,clock,alarm clock,watch,glasses,sunglasses,hat,crown,shoe,boot,sock,shirt,dress,scarf,glove,umbrella,backpack,wallet,key,lock,door,window,ladder,chair,table,bed,couch,lamp,bathtub,toilet,toothbrush,mirror,candle,book,pencil,scissors,paintbrush,envelope,gift,balloon,kite,ball,basketball,football,baseball bat,soccer,tennis,bowling,trophy,medal,dice,puzzle,yo-yo,teddy bear,doll,sword,shield,bow and arrow,treasure,map,compass,flag,bell,tooth,eye,nose,ear,hand,foot,brain,heart,skeleton,ghost,vampire,zombie,witch,pirate,ninja,astronaut,alien,mermaid,wizard,angel,king,queen,clown,cowboy,chef,doctor,firefighter,superhero,snowflake,fire,tornado,earth,planet,comet,telescope,hammer,saw,shovel,axe,bucket,broom,vacuum,fridge,oven,toaster,microwave,frying pan,teapot,cup,fork,spoon,knife,bottle,jar,basket,trash can,mailbox,fence,swing,slide,sandcastle,campfire,fishing,surfing,skiing,swimming,dancing,sleeping,running,jumping,crying,laughing,sneezing,yawning,juggling,painting,singing,reading,cooking,climbing,flying,diving,snoring,birthday,wedding,party,haircut,selfie,traffic jam,roller coaster,ferris wheel,carousel,circus,museum,library,zoo,farm,jungle,cave,spaceship,time machine,tooth fairy,santa,pumpkin,scarecrow,spider web,haunted house,mummy,bigfoot,loch ness,chicago,deep dish pizza,bean,el train,hot sauce,coffee,tea,milkshake,lemonade,soda,birthday cake,wedding cake,french fries,nachos,burrito,ramen,dumpling,croissant,bagel,waffle,cereal,peanut butter,jelly,honey,corn,potato,onion,garlic,pepper,avocado,coconut,peach,pear,strawberry,blueberry")
+  .split(",").map(w => w.trim()).filter(Boolean);
+
+/* ===== Firebase config (public web identifiers, safe to ship) ===== */
 const firebaseConfig = {
   apiKey: "AIzaSyAT5-dz4oerdZbyxok4aF-mujN7ll-qy3s",
   authDomain: "scattergories-friends.firebaseapp.com",
@@ -141,8 +320,156 @@ const firebaseConfig = {
   messagingSenderId: "540032330191",
   appId: "1:540032330191:web:c122f3c4836c6c36cd8aba"
 };
-/* ===================================================================== */
 
+/* =================================================================== */
+/*  Small helpers                                                       */
+/* =================================================================== */
+const $app = document.getElementById("app");
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch {} }
+};
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const entriesOf = x => !x ? [] : Array.isArray(x) ? x.map((v, i) => [String(i), v]).filter(([, v]) => v != null) : Object.entries(x);
+const arr = x => !x ? [] : Array.isArray(x) ? x.filter(v => v != null) : Object.values(x);
+const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
+const fmt = ms => { const s = Math.max(0, Math.ceil(ms / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
+const norm = s => String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "")
+  .replace(/&/g, " and ").replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim();
+const core = s => norm(s).replace(/^(the|a|an) /, "");
+function lev(a, b) {
+  if (Math.abs(a.length - b.length) > 2) return 9;
+  const d = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+  for (let j = 1; j <= b.length; j++) d[0][j] = j;
+  for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++)
+    d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+  return d[a.length][b.length];
+}
+const reduceMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------- toasts ---------- */
+function toast(msg, kind = "") {
+  let box = $("toasts");
+  if (!box) { box = document.createElement("div"); box.id = "toasts"; box.className = "toasts"; box.setAttribute("aria-live", "polite"); document.body.appendChild(box); }
+  const t = document.createElement("div"); t.className = `toast ${kind}`; t.textContent = msg; box.appendChild(t);
+  setTimeout(() => t.remove(), 2600);
+}
+
+/* ---------- sound (tiny synth, no files) ---------- */
+const Sound = {
+  muted: store.get("gn_mute") === "1", ctx: null,
+  unlock() { if (!this.ctx) { try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch {} } this.ctx?.resume?.(); },
+  tone(f, d, type = "sine", v = .07, at = 0) {
+    if (this.muted || !this.ctx) return;
+    const t = this.ctx.currentTime + at, o = this.ctx.createOscillator(), g = this.ctx.createGain();
+    o.type = type; o.frequency.value = f; g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    o.connect(g).connect(this.ctx.destination); o.start(t); o.stop(t + d + .02);
+  },
+  play(n) {
+    if (n === "tick") this.tone(1046, .06, "square", .025);
+    if (n === "start") { this.tone(523, .12, "triangle"); this.tone(784, .2, "triangle", .07, .1); }
+    if (n === "good") { this.tone(659, .1, "triangle"); this.tone(880, .1, "triangle", .07, .08); this.tone(1319, .25, "triangle", .07, .16); }
+    if (n === "end") { this.tone(587, .15, "triangle"); this.tone(440, .3, "triangle", .07, .14); }
+    if (n === "pop") this.tone(740, .05, "sine", .05);
+  }
+};
+document.addEventListener("pointerdown", () => Sound.unlock(), { capture: true });
+
+/* ---------- confetti ---------- */
+function confetti(n = 140) {
+  if (reduceMotion()) return;
+  const c = document.createElement("canvas"); c.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:90";
+  c.width = innerWidth; c.height = innerHeight; document.body.appendChild(c);
+  const ctx = c.getContext("2d"), cols = ["#ffd23f", "#ff6fb5", "#3ddc97", "#ffffff", "#ff5a4f"];
+  const ps = Array.from({ length: n }, () => ({ x: Math.random() * c.width, y: -20 - Math.random() * c.height * .4, vx: (Math.random() - .5) * 4,
+    vy: 2 + Math.random() * 4, r: Math.random() * 6.28, vr: (Math.random() - .5) * .3, s: 6 + Math.random() * 7, c: pick(cols) }));
+  const t0 = performance.now();
+  (function f(t) {
+    ctx.clearRect(0, 0, c.width, c.height);
+    for (const p of ps) { p.x += p.vx; p.y += p.vy; p.vy += .05; p.r += p.vr; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.fillStyle = p.c; ctx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); ctx.restore(); }
+    if (t - t0 < 3200) requestAnimationFrame(f); else c.remove();
+  })(t0);
+}
+
+/* =================================================================== */
+/*  Avatars                                                             */
+/* =================================================================== */
+const AV_COLORS = ["#ff6fb5", "#ffd23f", "#3ddc97", "#4cc9f0", "#9b5de5", "#ff8a3d", "#ff5a4f", "#b8f35d", "#f7c6a3", "#c9a7ff", "#7bdff2", "#ffffff"];
+const AV_EYES = ["Dots", "Googly", "Happy", "Sleepy", "Wink", "Ovals"];
+const AV_MOUTHS = ["Smile", "Grin", "Meh", "Oh", "Tongue", "Cat"];
+const AV_HATS = ["None", "Party hat", "Crown", "Cap", "Bow", "Glasses", "Headphones", "Beanie", "Halo"];
+const randomAvatar = () => ({ c: Math.floor(Math.random() * AV_COLORS.length), e: Math.floor(Math.random() * 6), m: Math.floor(Math.random() * 6), h: Math.floor(Math.random() * AV_HATS.length) });
+const cleanAv = a => ({ c: clamp(a?.c | 0, 0, AV_COLORS.length - 1), e: clamp(a?.e | 0, 0, 5), m: clamp(a?.m | 0, 0, 5), h: clamp(a?.h | 0, 0, AV_HATS.length - 1) });
+function avatarSVG(a) {
+  a = cleanAv(a);
+  const K = "#17183b", S = `stroke="${K}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"`;
+  const eye = (x, flip) => [
+    `<circle cx="${x}" cy="52" r="5" fill="${K}"/>`,
+    `<circle cx="${x}" cy="51" r="10" fill="#fff" ${S} stroke-width="3"/><circle cx="${x + 2}" cy="53" r="4.5" fill="${K}"/>`,
+    `<path d="M${x - 7} 54 Q${x} 44 ${x + 7} 54" fill="none" ${S}/>`,
+    `<path d="M${x - 7} 51 Q${x} 57 ${x + 7} 51" fill="none" ${S}/>`,
+    flip ? `<path d="M${x - 7} 54 Q${x} 44 ${x + 7} 54" fill="none" ${S}/>` : `<circle cx="${x}" cy="52" r="5" fill="${K}"/>`,
+    `<ellipse cx="${x}" cy="52" rx="4" ry="7.5" fill="${K}"/>`
+  ][a.e];
+  const mouth = [
+    `<path d="M40 67 Q50 77 60 67" fill="none" ${S}/>`,
+    `<path d="M36 64 Q50 86 64 64 Z" fill="${K}" ${S}/><ellipse cx="50" cy="74" rx="6" ry="3.5" fill="#ff6fb5"/>`,
+    `<path d="M41 70 L59 70" ${S}/>`,
+    `<circle cx="50" cy="70" r="5.5" fill="${K}"/>`,
+    `<path d="M40 66 Q50 74 60 66" fill="none" ${S}/><path d="M46 70 q4 10 9 0" fill="#ff6fb5" ${S} stroke-width="3"/>`,
+    `<path d="M40 66 q5 6 10 0 q5 6 10 0" fill="none" ${S}/>`
+  ][a.m];
+  const hat = [
+    "",
+    `<path d="M35 27 L50 -1 L65 27 Z" fill="#ffd23f" ${S}/><path d="M42 13 L58 13 M39 20 L61 20" stroke="#ff6fb5" stroke-width="4"/><circle cx="50" cy="1" r="5" fill="#ff6fb5" ${S} stroke-width="3"/>`,
+    `<path d="M30 28 L30 9 L40 19 L50 5 L60 19 L70 9 L70 28 Z" fill="#ffd23f" ${S}/><circle cx="50" cy="20" r="3.5" fill="#ff5a4f"/>`,
+    `<path d="M20 38 Q22 10 50 10 Q78 10 80 38 Z" fill="#2b3be0" ${S}/><path d="M60 37 L94 41 Q92 47 62 44 Z" fill="#2b3be0" ${S}/><circle cx="50" cy="11" r="3.5" fill="${K}"/>`,
+    `<path d="M72 22 L58 12 L58 32 Z M72 22 L86 12 L86 32 Z" fill="#ff6fb5" ${S} stroke-width="3.5"/><circle cx="72" cy="22" r="5" fill="#ff6fb5" ${S} stroke-width="3.5"/>`,
+    `<circle cx="38" cy="52" r="12" fill="rgba(255,255,255,.35)" ${S} stroke-width="3.5"/><circle cx="62" cy="52" r="12" fill="rgba(255,255,255,.35)" ${S} stroke-width="3.5"/><path d="M50 52 L50 52" ${S}/><path d="M48 50 Q50 47 52 50" fill="none" ${S} stroke-width="3"/>`,
+    `<path d="M17 56 Q15 12 50 12 Q85 12 83 56" fill="none" stroke="${K}" stroke-width="7" stroke-linecap="round"/><rect x="8" y="46" width="15" height="24" rx="6" fill="#ff5a4f" ${S} stroke-width="3.5"/><rect x="77" y="46" width="15" height="24" rx="6" fill="#ff5a4f" ${S} stroke-width="3.5"/>`,
+    `<path d="M19 40 Q20 6 50 6 Q80 6 81 40 Z" fill="#3ddc97" ${S}/><rect x="16" y="33" width="68" height="11" rx="5.5" fill="#3ddc97" ${S} stroke-width="3.5"/><circle cx="50" cy="6" r="6" fill="#ffd23f" ${S} stroke-width="3.5"/>`,
+    `<ellipse cx="50" cy="9" rx="21" ry="6" fill="none" stroke="#ffd23f" stroke-width="5"/>`
+  ][a.h];
+  return `<svg viewBox="0 -4 100 104" aria-hidden="true"><circle cx="50" cy="56" r="36" fill="${AV_COLORS[a.c]}" ${S}/>` +
+    `<ellipse cx="31" cy="64" rx="5" ry="3" fill="#ff6fb5" opacity=".35"/><ellipse cx="69" cy="64" rx="5" ry="3" fill="#ff6fb5" opacity=".35"/>` +
+    eye(38, false) + eye(62, true) + mouth + hat + `</svg>`;
+}
+const av = (a, size = 36) => `<span class="av" style="width:${size}px;height:${size}px">${avatarSVG(a)}</span>`;
+
+function avatarBuilderHTML(a) {
+  const row = (key, label, list) => `<div class="avrow"><span>${label}</span>
+    <button type="button" class="btn sm iconbtn" data-av="${key}" data-d="-1" aria-label="Previous ${label.toLowerCase()}">‹</button>
+    <span class="val" data-avval="${key}">${esc(list[a[key]])}</span>
+    <button type="button" class="btn sm iconbtn" data-av="${key}" data-d="1" aria-label="Next ${label.toLowerCase()}">›</button></div>`;
+  return `<div class="avbuilder">
+    <div class="preview" id="avprev">${avatarSVG(a)}</div>
+    <div class="avrows">
+      <div class="swatches" role="group" aria-label="Color">${AV_COLORS.map((c, i) => `<button type="button" class="swatch" data-avc="${i}" style="background:${c}" aria-label="Color ${i + 1}" aria-pressed="${i === a.c}"></button>`).join("")}</div>
+      ${row("e", "Eyes", AV_EYES)}${row("m", "Mouth", AV_MOUTHS)}${row("h", "Extra", AV_HATS)}
+      <button type="button" class="btn sm" id="avrand">Shuffle</button>
+    </div></div>`;
+}
+function wireAvatarBuilder(root, a, onChange) {
+  const lists = { e: AV_EYES, m: AV_MOUTHS, h: AV_HATS };
+  const paint = () => {
+    root.querySelector("#avprev").innerHTML = avatarSVG(a);
+    root.querySelectorAll("[data-avval]").forEach(el => el.textContent = lists[el.dataset.avval][a[el.dataset.avval]]);
+    root.querySelectorAll("[data-avc]").forEach(el => el.setAttribute("aria-pressed", String(+el.dataset.avc === a.c)));
+    onChange({ ...a });
+  };
+  root.querySelectorAll("[data-av]").forEach(b => b.addEventListener("click", () => {
+    const k = b.dataset.av, n = lists[k].length; a[k] = (a[k] + Number(b.dataset.d) + n) % n; Sound.play("pop"); paint();
+  }));
+  root.querySelectorAll("[data-avc]").forEach(b => b.addEventListener("click", () => { a.c = +b.dataset.avc; Sound.play("pop"); paint(); }));
+  root.querySelector("#avrand").addEventListener("click", () => { Object.assign(a, randomAvatar()); Sound.play("pop"); paint(); });
+}
+
+/* =================================================================== */
+/*  Game content                                                        */
+/* =================================================================== */
 const CATEGORIES = [
   "A boy's name", "A girl's name", "Animals", "Things in a kitchen", "Fruits", "Vegetables",
   "Cities", "Countries", "U.S. states", "Rivers", "Bodies of water", "Things at a beach",
@@ -165,282 +492,323 @@ const CATEGORIES = [
   "Brands", "Magazines or newspapers", "Things in a garage", "Halloween costumes", "Things associated with winter", "Things associated with summer",
   "Things you sit on", "Things you get in the mail", "Bad habits", "Things grandparents say", "Ways to get around", "Kinds of dances"
 ];
-const LETTERS = "ABCDEFGHIJKLMNOPRSTW".split(""); // no Q, U, V, X, Y, Z
+const LETTERS = "ABCDEFGHIJKLMNOPRSTW".split("");
+const DEFAULT_SETTINGS = { timer: 120, cats: 12, rounds: 5, voteTime: 60, drawTime: 80, drawRounds: 3, hints: 1, customWords: "", customOnly: 0 };
+const PALETTE = ["#17183b", "#ffffff", "#9a9db8", "#7a4b2a", "#ff5a4f", "#ff8a3d", "#ffd23f", "#b8f35d", "#3ddc97", "#1f9e5a", "#4cc9f0", "#2b3be0", "#9b5de5", "#ff6fb5"];
+const SIZES = [4, 10, 22, 42];
+const CW = 800, CH = 600;
 
-const $app = document.getElementById("app");
-const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const store = {
-  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
-  set(k, v) { try { localStorage.setItem(k, v); } catch {} }
-};
-const pick = a => a[Math.floor(Math.random() * a.length)];
-const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
-// Firebase can return objects with numeric keys as arrays (with null gaps). Normalize to entries.
-const entriesOf = x => !x ? [] : Array.isArray(x) ? x.map((v, i) => [String(i), v]).filter(([, v]) => v != null) : Object.entries(x);
-const arr = x => !x ? [] : Array.isArray(x) ? x.filter(v => v != null) : Object.values(x);
-
+/* =================================================================== */
+/*  App                                                                 */
+/* =================================================================== */
 const configured = firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith("PASTE") && firebaseConfig.databaseURL;
-if (!configured) {
-  $app.innerHTML = `<div class="card setup"><h2>Almost ready</h2>
-    <p>This game needs a free Firebase Realtime Database to sync players.</p>
-    <p>Open <code>index.html</code>, find <code>firebaseConfig</code> near the top of the script, and paste in your Firebase web app config (including <code>databaseURL</code>). See the README for step-by-step setup.</p></div>`;
-} else {
-  main();
-}
+if (!configured) $app.innerHTML = `<div class="card" style="max-width:520px;margin:10vh auto"><h2>Firebase isn't set up</h2><p class="muted" style="margin-top:8px">Paste your Firebase web config into <b>firebaseConfig</b> in index.html.</p></div>`;
+else main();
 
 function main() {
-  const fb = initializeApp(firebaseConfig);
-  const db = getDatabase(fb);
-
-  const pid = store.get("sg_pid") || (() => {
-    const id = Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
-    store.set("sg_pid", id); return id;
-  })();
+  const db = getDatabase(initializeApp(firebaseConfig));
+  const pid = store.get("sg_pid") || (() => { const id = Math.random().toString(36).slice(2, 10) + Date.now().toString(36); store.set("sg_pid", id); return id; })();
+  let myAv = (() => { try { const a = JSON.parse(store.get("gn_av")); if (a) return cleanAv(a); } catch {} const a = randomAvatar(); store.set("gn_av", JSON.stringify(a)); return a; })();
 
   let offset = 0;
   onValue(ref(db, ".info/serverTimeOffset"), s => { offset = s.val() || 0; });
   const now = () => Date.now() + offset;
 
-  let CODE = null;      // current room code
-  let room = null;      // latest room snapshot
-  let viewKey = null;   // which screen is rendered
-  let unsubRoom = null;
-  let acted = "";       // guards host automation from firing twice
-  let view = {};        // per-screen local state
-
-  const roomPath = (p = "") => `rooms/${CODE}${p ? "/" + p : ""}`;
+  let CODE = null, room = null, viewKey = null, view = {}, acted = "", unsubs = [];
+  const G = (p = "") => ref(db, `rooms/${CODE}/g${p ? "/" + p : ""}`);
+  const strokesRef = () => ref(db, `rooms/${CODE}/strokes`);
+  const chatRef = () => ref(db, `rooms/${CODE}/chat`);
+  const S = () => ({ ...DEFAULT_SETTINGS, ...(room?.settings || {}) });
   const inviteUrl = () => `${location.origin}${location.pathname}?room=${CODE}`;
-  const playerIds = () => entriesOf(room?.players)
-    .sort((a, b) => (a[1].joinedAt || 0) - (b[1].joinedAt || 0) || a[0].localeCompare(b[0]))
-    .map(([id]) => id);
+  const playerIds = () => entriesOf(room?.players).sort((a, b) => (a[1].joinedAt || 0) - (b[1].joinedAt || 0) || a[0].localeCompare(b[0])).map(([id]) => id);
   const onlineIds = () => playerIds().filter(id => room.players[id].online);
   const hostId = () => onlineIds()[0];
   const isHost = () => hostId() === pid;
-  const nameOf = id => room?.players?.[id]?.name || "?";
+  const P = id => room?.players?.[id] || {};
+  const nameOf = id => P(id).name || "?";
+  const avOf = (id, size) => av(P(id).av, size);
 
-  // ---------- Home ----------
+  function totals() {
+    const t = Object.fromEntries(playerIds().map(id => [id, 0]));
+    for (const [, sc] of entriesOf(room.scores)) for (const [id, v] of entriesOf(sc)) t[id] = (t[id] || 0) + (v || 0);
+    return t;
+  }
+
+  /* ---------- shared chrome ---------- */
+  function topbar() {
+    const r = room.round || 0, inGame = !["lobby", "final"].includes(room.phase);
+    const R = room.mode === "draw" ? S().drawRounds : S().rounds;
+    return `<header class="topbar">
+      <span class="brand">Game Night</span>
+      <span class="roompill" title="Room code">${esc(CODE)}</span>
+      <button class="btn sm" data-copy>Copy invite link</button>
+      <span class="spacer"></span>
+      ${inGame && r ? `<span class="roundinfo">Round ${r} of ${R}</span>` : ""}
+      <button class="btn sm iconbtn" id="mute" aria-label="${Sound.muted ? "Turn sound on" : "Turn sound off"}">${Sound.muted ? "🔇" : "🔊"}</button>
+      <button class="btn sm ghost" id="leave">Leave</button>
+    </header>`;
+  }
+  function wireChrome() {
+    $app.querySelectorAll("[data-copy]").forEach(b => b.addEventListener("click", async () => {
+      const label = b.dataset.label || (b.dataset.label = b.textContent);
+      try { await navigator.clipboard.writeText(inviteUrl()); b.textContent = "Copied"; } catch { prompt("Copy this link:", inviteUrl()); }
+      setTimeout(() => (b.textContent = label), 1500);
+    }));
+    $("mute")?.addEventListener("click", e => {
+      Sound.muted = !Sound.muted; store.set("gn_mute", Sound.muted ? "1" : "0");
+      e.currentTarget.textContent = Sound.muted ? "🔇" : "🔊"; e.currentTarget.setAttribute("aria-label", Sound.muted ? "Turn sound on" : "Turn sound off");
+    });
+    $("leave")?.addEventListener("click", async () => {
+      try { await set(G(`players/${pid}/online`), false); } catch {}
+      location.href = location.pathname;
+    });
+  }
+  const ringHTML = id => `<div class="ring" id="${id}"><svg viewBox="0 0 80 80"><circle class="track" cx="40" cy="40" r="33"/><circle class="bar" cx="40" cy="40" r="33" stroke-dasharray="207.3" stroke-dashoffset="0"/></svg><span class="t">–</span></div>`;
+  function setRing(id, left, total) {
+    const el = $(id); if (!el) return;
+    const frac = total > 0 ? clamp(left / total, 0, 1) : 0;
+    el.querySelector(".bar").setAttribute("stroke-dashoffset", String(207.3 * (1 - frac)));
+    el.querySelector(".t").textContent = left > 60000 ? fmt(left) : String(Math.max(0, Math.ceil(left / 1000)));
+    el.classList.toggle("low", left <= 10000);
+  }
+  function tickSound(left) {
+    const s = Math.ceil(left / 1000);
+    if (left > 0 && s <= 5 && view.lastTick !== s) { view.lastTick = s; Sound.play("tick"); }
+  }
+
+  /* ---------- home ---------- */
   function renderHome(err) {
     viewKey = null;
     const code = (new URLSearchParams(location.search).get("room") || "").toUpperCase();
     $app.innerHTML = `
-      <div class="card home">
-        <h1>Scatter<span>gories</span></h1>
-        <p class="sub">Play live with friends, anywhere.</p>
-        <label>Display name<input id="name" maxlength="20" placeholder="Your name" value="${esc(store.get("sg_name") || "")}"></label>
-        ${code ? `
-          <button id="joinUrl" class="primary">Join room ${esc(code)}</button>
-          <button id="fresh" class="link">Start a different room instead</button>` : `
-          <button id="create" class="primary">Create a room</button>
-          <div class="or">or join a friend's room</div>
-          <div class="row"><input id="code" class="code-in" maxlength="4" placeholder="CODE"><button id="join">Join</button></div>`}
-        ${err ? `<p class="err">${esc(err)}</p>` : ""}
+      <div class="home">
+        <div><h1 class="wordmark">Game<br>Night</h1>
+          <p class="tagline">Scattergories and Sketch & Guess for friends in different cities. Make a face, grab a name, share the link.</p></div>
+        <div class="home-grid">
+          <section class="card"><h2 style="margin-bottom:14px">Your player</h2>${avatarBuilderHTML({ ...myAv })}</section>
+          <section class="card stack">
+            <label class="field">Display name<input class="input" id="name" maxlength="20" autocomplete="nickname" placeholder="What should friends call you?" value="${esc(store.get("sg_name") || "")}"></label>
+            ${code ? `<button class="btn primary wide" id="joinUrl">Join room ${esc(code)}</button>
+              <button class="btn sm" id="fresh" style="margin-left:auto;display:flex">Start a different room</button>` : `
+              <button class="btn primary wide" id="create">Create a room</button>
+              <p class="or">or join a friend's room</p>
+              <div class="joinrow"><input class="input" id="code" maxlength="4" placeholder="CODE" aria-label="Room code" autocapitalize="characters"><button class="btn" id="join">Join</button></div>`}
+            ${err ? `<p class="err" role="alert">${esc(err)}</p>` : ""}
+          </section>
+        </div>
       </div>`;
-    const nameEl = document.getElementById("name");
+    wireAvatarBuilder($app, { ...myAv }, a => { myAv = a; store.set("gn_av", JSON.stringify(a)); });
+    const nameEl = $("name");
     const getName = () => {
       const n = nameEl.value.trim();
-      if (!n) { nameEl.focus(); nameEl.style.borderColor = "var(--bad)"; return null; }
+      if (!n) { nameEl.focus(); nameEl.style.borderColor = "var(--tomato)"; toast("Add a display name first"); return null; }
       store.set("sg_name", n); return n;
     };
-    document.getElementById("create")?.addEventListener("click", async () => { const n = getName(); if (n) createRoom(n); });
-    document.getElementById("join")?.addEventListener("click", () => {
-      const n = getName(); const c = document.getElementById("code").value.trim().toUpperCase();
-      if (n && c) joinRoom(c, n);
-    });
-    document.getElementById("code")?.addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("join").click(); });
-    document.getElementById("joinUrl")?.addEventListener("click", () => { const n = getName(); if (n) joinRoom(code, n); });
-    document.getElementById("fresh")?.addEventListener("click", () => { history.replaceState(null, "", location.pathname); renderHome(); });
+    $("create")?.addEventListener("click", () => { const n = getName(); if (n) createRoom(n); });
+    $("join")?.addEventListener("click", () => { const n = getName(), c = $("code").value.trim().toUpperCase(); if (n && c) joinRoom(c, n); });
+    $("code")?.addEventListener("keydown", e => { if (e.key === "Enter") $("join").click(); });
+    $("joinUrl")?.addEventListener("click", () => { const n = getName(); if (n) joinRoom(code, n); });
+    $("fresh")?.addEventListener("click", () => { history.replaceState(null, "", location.pathname); renderHome(); });
   }
 
   async function createRoom(name) {
-    const chars = "ABCDEFGHJKLMNPRSTUVWXYZ";
-    let code;
-    for (let tries = 0; tries < 10; tries++) {
-      code = Array.from({ length: 4 }, () => pick(chars)).join("");
-      const s = await get(ref(db, `rooms/${code}/createdAt`));
-      if (!s.exists()) break;
-    }
-    await set(ref(db, `rooms/${code}`), {
-      createdAt: serverTimestamp(), phase: "lobby", round: 0,
-      settings: { timer: 120, cats: 12, rounds: 5 }
-    });
+    const chars = "ABCDEFGHJKLMNPRSTUVWXYZ"; let code;
+    for (let i = 0; i < 10; i++) { code = Array.from({ length: 4 }, () => pick(chars)).join(""); if (!(await get(ref(db, `rooms/${code}/g/createdAt`))).exists()) break; }
+    await set(ref(db, `rooms/${code}/g`), { createdAt: serverTimestamp(), mode: "scatter", phase: "lobby", round: 0, settings: DEFAULT_SETTINGS });
     joinRoom(code, name);
   }
 
   async function joinRoom(code, name) {
     try {
-      const exists = await get(ref(db, `rooms/${code}/createdAt`));
-      if (!exists.exists()) return renderHome(`Room ${code} wasn't found. Check the code.`);
+      if (!(await get(ref(db, `rooms/${code}/g/createdAt`))).exists()) return renderHome(`There's no room ${code}. Check the code with whoever invited you.`);
       CODE = code;
-      const meRef = ref(db, roomPath(`players/${pid}`));
-      const me = await get(meRef);
-      if (me.exists()) await update(meRef, { name, online: true });
-      else await set(meRef, { name, joinedAt: serverTimestamp(), online: true, done: false });
-      onValue(ref(db, ".info/connected"), s => {
-        if (s.val() && CODE === code) {
-          const onRef = ref(db, `rooms/${code}/players/${pid}/online`);
-          onDisconnect(onRef).set(false);
-          set(onRef, true);
-        }
-      });
+      const meRef = G(`players/${pid}`);
+      if ((await get(meRef)).exists()) await update(meRef, { name, av: myAv, online: true });
+      else await set(meRef, { name, av: myAv, joinedAt: serverTimestamp(), online: true, done: false });
+      unsubs.forEach(u => u()); unsubs = [];
+      unsubs.push(onValue(ref(db, ".info/connected"), s => {
+        if (s.val() && CODE === code) { const r = G(`players/${pid}/online`); onDisconnect(r).set(false); set(r, true); }
+      }));
       history.replaceState(null, "", `?room=${code}`);
-      if (unsubRoom) unsubRoom();
-      unsubRoom = onValue(ref(db, `rooms/${code}`), s => { room = s.val(); onRoom(); });
-    } catch (e) {
-      console.error(e);
-      renderHome("Couldn't connect: " + e.message);
-    }
+      // chat + strokes live outside the game node so the main listener stays light
+      chatMsgs = [];
+      const cq = query(chatRef(), limitToLast(80));
+      unsubs.push(onChildAdded(cq, s => { chatMsgs.push({ key: s.key, ...s.val() }); if (chatMsgs.length > 80) chatMsgs.shift(); renderChat(); }));
+      unsubs.push(onChildRemoved(cq, s => { chatMsgs = chatMsgs.filter(m => m.key !== s.key); renderChat(); }));
+      unsubs.push(onChildAdded(strokesRef(), s => onStroke("add", s.key, s.val())));
+      unsubs.push(onChildChanged(strokesRef(), s => onStroke("change", s.key, s.val())));
+      unsubs.push(onChildRemoved(strokesRef(), s => onStroke("remove", s.key)));
+      unsubs.push(onValue(G(), s => { room = s.val(); onRoom(); }));
+    } catch (e) { console.error(e); renderHome("Couldn't connect: " + e.message); }
   }
 
-  // ---------- Room state → screens ----------
   function onRoom() {
     if (!room) { renderHome("That room no longer exists."); return; }
-    const key = `${room.phase}:${room.round}:${isHost()}`;
+    if (room.phase === "lobby") acted = "";
+    const draw = room.phase?.startsWith("d_");
+    const key = draw ? `draw:${room.round}:${room.turn}:${isHost()}` : `${room.phase}:${room.round}:${isHost()}:${room.mode}`;
     if (key !== viewKey) {
-      if (view.pending) flush();
-      if (room.phase === "lobby") acted = "";
-      viewKey = key; view = {}; render();
+      if (view.pending) flushAnswers();
+      viewKey = key; view = {};
+      ({ lobby: renderLobby, answering: renderAnswering, voting: renderVoting, scores: renderScores, final: renderFinal,
+         d_choose: renderDraw, d_draw: renderDraw, d_reveal: renderDraw }[room.phase] || renderLobby)();
+      $app.querySelector(".pop-target")?.classList.add("pop");
+    } else {
+      ({ lobby: refreshLobby, answering: refreshAnswering, voting: refreshVoting, d_choose: refreshDraw, d_draw: refreshDraw, d_reveal: refreshDraw }[room.phase] || (() => {}))();
     }
-    else refresh();
   }
 
-  function render() {
-    ({ lobby: renderLobby, answering: renderAnswering, voting: renderVoting, scores: renderScores, final: renderScores }[room.phase] || renderLobby)();
+  /* =================================================================== */
+  /*  Lobby                                                               */
+  /* =================================================================== */
+  function playerRows() {
+    return playerIds().map(id => { const p = P(id);
+      return `<div class="prow ${id === pid ? "me" : ""} ${p.online ? "" : "off"}">${avOf(id, 46)}
+        <span class="name">${esc(p.name)}</span>${id === hostId() ? `<span class="tag">Host</span>` : ""}${id === pid ? `<span class="tag">You</span>` : ""}${p.online ? "" : `<span class="tag">Away</span>`}</div>`; }).join("");
   }
-  function refresh() {
-    ({ lobby: refreshLobby, answering: refreshAnswering, voting: refreshVoting, scores: () => {}, final: () => {} }[room.phase] || (() => {}))();
+  function settingsHTML() {
+    const s = S(), host = isHost();
+    const sel = (key, label, opts, f = x => x) => `<label class="field">${label}${host
+      ? `<select class="input" data-set="${key}">${opts.map(o => `<option value="${o}" ${o == s[key] ? "selected" : ""}>${f(o)}</option>`).join("")}</select>`
+      : `<div class="val" data-val="${key}">${esc(f(s[key]))}</div>`}</label>`;
+    const secs = t => t >= 60 ? fmt(t * 1000) : `${t}s`;
+    if (room.mode === "draw") return `<div class="settings">
+        ${sel("drawTime", "Drawing time", [60, 80, 100, 120, 150], secs)}${sel("drawRounds", "Rounds", [1, 2, 3, 4, 5, 6])}
+        ${sel("hints", "Letter hints", [1, 0], v => (+v ? "On" : "Off"))}</div>
+      <label class="field" style="margin-bottom:18px">Your own words (optional, comma separated)
+        ${host ? `<textarea class="input" id="customWords" maxlength="2000" placeholder="inside jokes, friend names, places you've been">${esc(s.customWords)}</textarea>
+          <span style="display:flex;gap:8px;align-items:center;margin-top:8px;font-weight:600"><input type="checkbox" id="customOnly" ${+s.customOnly ? "checked" : ""}> Only use these words</span>`
+        : `<div class="muted" style="margin-top:6px;font-weight:600">${s.customWords ? `${s.customWords.split(",").filter(w => w.trim()).length} custom words added${+s.customOnly ? " (custom only)" : ""}` : "None added"}</div>`}</label>`;
+    return `<div class="settings">${sel("timer", "Answer time", [60, 90, 120, 150, 180], secs)}${sel("cats", "Categories", [6, 8, 10, 12])}
+      ${sel("rounds", "Rounds", [1, 2, 3, 4, 5, 6, 8, 10])}${sel("voteTime", "Voting time", [30, 45, 60, 90, 120], secs)}</div>`;
   }
-
-  function topbar() {
-    const r = room.round || 0, R = room.settings?.rounds || 0;
-    return `<div class="topbar">
-      <span>Room <b>${esc(CODE)}</b> <button class="small" data-copy>Copy invite link</button></span>
-      ${r ? `<span>Round ${r} of ${R}</span>` : ""}
-    </div>`;
-  }
-  function wireCopy() {
-    $app.querySelectorAll("[data-copy]").forEach(b => b.addEventListener("click", async () => {
-      b.dataset.label = b.dataset.label || b.textContent;
-      try { await navigator.clipboard.writeText(inviteUrl()); b.textContent = "Copied!"; }
-      catch { prompt("Copy this link:", inviteUrl()); }
-      setTimeout(() => (b.textContent = b.dataset.label || "Copy invite link"), 1500);
-    }));
-  }
-  function playerChips(extra = () => "", cls = () => "") {
-    return playerIds().map(id => {
-      const p = room.players[id];
-      return `<span class="chip ${id === pid ? "me" : ""} ${p.online ? "" : "off"} ${cls(id)}">${esc(p.name)}${id === hostId() ? " 👑" : ""}${extra(id)}</span>`;
-    }).join("");
-  }
-
-  // ---------- Lobby ----------
   function renderLobby() {
-    const s = room.settings;
-    const sel = (key, opts, fmt) => isHost()
-      ? `<select data-set="${key}">${opts.map(o => `<option value="${o}" ${o === s[key] ? "selected" : ""}>${fmt(o)}</option>`).join("")}</select>`
-      : `<div class="val" data-val="${key}">${fmt(s[key])}</div>`;
-    const fmtTime = t => `${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")}`;
-    $app.innerHTML = `
-      ${topbar()}
-      <div class="card">
-        <h2 style="margin-top:0">Lobby</h2>
-        <div class="invite"><code>${esc(inviteUrl())}</code><button class="small" data-copy>Copy</button></div>
-        <h3 style="margin-top:16px">Players</h3>
-        <div class="chips" id="players">${playerChips()}</div>
-        <div class="settings">
-          <label>Timer${sel("timer", [60, 90, 120, 150, 180], fmtTime)}</label>
-          <label>Categories${sel("cats", [6, 8, 10, 12], x => x)}</label>
-          <label>Rounds${sel("rounds", [1, 2, 3, 4, 5, 6, 8, 10], x => x)}</label>
-        </div>
-        ${isHost()
-          ? `<button class="primary" id="start">Start game</button>`
-          : `<div class="waiting">Waiting for ${esc(nameOf(hostId()))} to start…</div>`}
+    const host = isHost(), mode = room.mode || "scatter";
+    $app.innerHTML = `${topbar()}
+      <div class="lobby">
+        <section class="card pop-target">
+          <h2>Players</h2>
+          <div class="plist" id="plist">${playerRows()}</div>
+          <button class="btn sm" id="editav" style="margin-top:12px">Edit my player</button>
+          <div class="invite"><span>${esc(inviteUrl())}</span><button class="btn sm" data-copy>Copy</button></div>
+        </section>
+        <section class="card">
+          <h2>${host ? "Pick a game" : "Up next"}</h2>
+          <div class="games">
+            <button class="gametile" data-mode="scatter" aria-pressed="${mode === "scatter"}" ${host ? "" : "disabled"}>
+              <span class="gt-art"><span class="mini-die">S</span><span class="mini-die">B</span></span>
+              <span class="gt-title">Scattergories</span>
+              <span class="gt-desc">One letter, a list of categories, a ticking clock. Unique answers score.</span></button>
+            <button class="gametile" data-mode="draw" aria-pressed="${mode === "draw"}" ${host ? "" : "disabled"}>
+              <span class="gt-art">${drawTileArt()}</span>
+              <span class="gt-title">Sketch & Guess</span>
+              <span class="gt-desc">Take turns drawing a secret word while everyone races to guess it in chat.</span></button>
+          </div>
+          <div id="settings">${settingsHTML()}</div>
+          ${host ? `<button class="btn primary wide" id="start">Start ${mode === "draw" ? "Sketch & Guess" : "Scattergories"}</button>`
+                 : `<p class="waiting">Waiting for ${esc(nameOf(hostId()))} to start the game</p>`}
+        </section>
       </div>`;
-    wireCopy();
-    $app.querySelectorAll("[data-set]").forEach(el => el.addEventListener("change", () =>
-      set(ref(db, roomPath(`settings/${el.dataset.set}`)), Number(el.value))));
-    document.getElementById("start")?.addEventListener("click", startRound);
+    wireChrome();
+    $app.querySelectorAll("[data-mode]").forEach(b => b.addEventListener("click", () => { if (isHost()) set(G("mode"), b.dataset.mode); }));
+    $app.querySelectorAll("[data-set]").forEach(el => el.addEventListener("change", () => set(G(`settings/${el.dataset.set}`), Number(el.value))));
+    $("customWords")?.addEventListener("change", e => set(G("settings/customWords"), e.target.value.slice(0, 2000)));
+    $("customOnly")?.addEventListener("change", e => set(G("settings/customOnly"), e.target.checked ? 1 : 0));
+    $("editav").addEventListener("click", openAvatarModal);
+    $("start")?.addEventListener("click", () => {
+      if (room.mode === "draw") {
+        if (+S().customOnly && customWords().length < 3) return toast("Add at least 3 custom words, or turn off custom only");
+        startDrawGame();
+      } else startRound();
+    });
   }
   function refreshLobby() {
-    const p = document.getElementById("players"); if (p) p.innerHTML = playerChips();
-    const fmtTime = t => `${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")}`;
-    $app.querySelectorAll("[data-val]").forEach(el => {
-      const k = el.dataset.val, v = room.settings[k];
-      el.textContent = k === "timer" ? fmtTime(v) : v;
+    $("plist").innerHTML = playerRows();
+    const s = S();
+    $app.querySelectorAll("[data-val]").forEach(el => { const k = el.dataset.val; const v = s[k];
+      el.textContent = ["timer", "voteTime", "drawTime"].includes(k) ? (v >= 60 ? fmt(v * 1000) : `${v}s`) : k === "hints" ? (+v ? "On" : "Off") : v; });
+    $app.querySelectorAll("[data-set]").forEach(el => { if (document.activeElement !== el) el.value = s[el.dataset.set]; });
+  }
+  const drawTileArt = () => `<svg width="110" height="60" viewBox="0 0 110 60" aria-hidden="true"><rect x="3" y="3" width="80" height="54" rx="10" fill="#fff" stroke="#17183b" stroke-width="3"/>
+    <path d="M14 42 Q26 14 40 34 T66 22" fill="none" stroke="#ff6fb5" stroke-width="5" stroke-linecap="round"/><path d="M84 8 L102 26 L74 54 L62 56 L64 44 Z" fill="#ffd23f" stroke="#17183b" stroke-width="3" stroke-linejoin="round"/></svg>`;
+  function openAvatarModal() {
+    const m = document.createElement("div"); m.className = "modal";
+    const a = { ...cleanAv(P(pid).av || myAv) };
+    m.innerHTML = `<div class="card pop" role="dialog" aria-modal="true" aria-label="Edit your player">
+      <h2 style="margin-bottom:14px">Edit your player</h2>${avatarBuilderHTML(a)}
+      <label class="field" style="margin-top:16px">Display name<input class="input" id="rename" maxlength="20" value="${esc(nameOf(pid))}"></label>
+      <div style="display:flex;justify-content:flex-end;margin-top:16px"><button class="btn primary" id="avdone">Save</button></div></div>`;
+    document.body.appendChild(m);
+    let cur = { ...a };
+    wireAvatarBuilder(m, a, x => { cur = x; });
+    const close = () => m.remove();
+    m.addEventListener("click", e => { if (e.target === m) close(); });
+    m.addEventListener("keydown", e => { if (e.key === "Escape") close(); });
+    m.querySelector("#avdone").addEventListener("click", () => {
+      myAv = cur; store.set("gn_av", JSON.stringify(cur));
+      const n = m.querySelector("#rename").value.trim().slice(0, 20);
+      const upd = { av: cur }; if (n) { upd.name = n; store.set("sg_name", n); }
+      update(G(`players/${pid}`), upd); close(); toast("Saved your player");
     });
-    $app.querySelectorAll("[data-set]").forEach(el => {
-      if (document.activeElement !== el) el.value = room.settings[el.dataset.set];
-    });
+    m.querySelector("#avdone").focus();
   }
 
+  function resetToLobby() {
+    remove(strokesRef()); remove(chatRef());
+    update(G(), { phase: "lobby", round: 0, turn: null, scores: null, answers: null, votes: null, categories: null, letter: null,
+      usedLetters: null, draw: null, order: null, usedWords: null, votingEndsAt: null, nextAt: null, roundStartsAt: null, roundEndsAt: null,
+      chooseEndsAt: null, turnEndsAt: null, turnStartsAt: null, revealEndsAt: null });
+  }
+
+  /* =================================================================== */
+  /*  Scattergories                                                       */
+  /* =================================================================== */
   function startRound() {
-    const s = room.settings;
-    let used = arr(room.usedLetters);
-    let pool = LETTERS.filter(l => !used.includes(l));
-    if (!pool.length) { used = []; pool = LETTERS.slice(); }
-    const letter = pick(pool);
-    const t = now();
-    const upd = {
-      phase: "answering", round: (room.round || 0) + 1, letter,
-      usedLetters: [...used, letter],
-      categories: shuffle(CATEGORIES.slice()).slice(0, s.cats),
-      roundStartsAt: t + 4000, roundEndsAt: t + 4000 + s.timer * 1000, nextAt: null
-    };
+    const s = S(); let used = arr(room.usedLetters);
+    let pool = LETTERS.filter(l => !used.includes(l)); if (!pool.length) { used = []; pool = LETTERS.slice(); }
+    const letter = pick(pool), t = now();
+    const upd = { mode: "scatter", phase: "answering", round: (room.round || 0) + 1, letter, usedLetters: [...used, letter],
+      categories: shuffle(CATEGORIES.slice()).slice(0, s.cats), roundStartsAt: t + 4000, roundEndsAt: t + 4000 + s.timer * 1000,
+      nextAt: null, votingEndsAt: null };
     for (const id of playerIds()) upd[`players/${id}/done`] = false;
-    update(ref(db, roomPath()), upd);
+    update(G(), upd);
   }
-
-  // ---------- Answering ----------
-  function myAnswers() { return room.answers?.[room.round]?.[pid] || {}; }
+  const myAnswers = () => room.answers?.[room.round]?.[pid] || {};
   function renderAnswering() {
     const cats = arr(room.categories), mine = myAnswers();
-    $app.innerHTML = `
-      ${topbar()}
-      <div class="stage"><div class="letter" id="letter">?</div><div class="timer" id="timer">--:--</div></div>
-      <div class="chips" id="progress"></div>
-      <ol class="answers">
-        ${cats.map((c, i) => `<li><label for="a${i}">${esc(c)}</label>
-          <input id="a${i}" data-i="${i}" autocomplete="off" autocapitalize="words" spellcheck="false" maxlength="60" disabled value="${esc(mine[i] ?? "")}"></li>`).join("")}
-      </ol>
-      <p class="hint">Answers save as you type. When the timer hits 0, they lock in automatically.</p>
-      <div class="overlay" id="overlay"><div><div style="font-weight:700;color:var(--muted)">Round ${room.round} starting in</div><div class="big" id="count">3</div></div></div>`;
-    wireCopy();
-    view.pending = {};
-    view.round = room.round;
-    view.inputs = [...$app.querySelectorAll("ol.answers input")];
+    $app.innerHTML = `${topbar()}
+      <div class="card" style="margin-bottom:20px"><div class="stage">
+        <div class="die rolling" id="die" aria-live="polite">?</div>${ringHTML("ring")}<div class="progress" id="progress"></div></div></div>
+      <section class="card pop-target"><ol class="answers">
+        ${cats.map((c, i) => `<li><label for="a${i}">${esc(c)}</label><input class="input" id="a${i}" data-i="${i}" autocomplete="off" autocapitalize="words" spellcheck="false" maxlength="60" disabled value="${esc(mine[i] ?? "")}"></li>`).join("")}
+      </ol></section>
+      <p class="hint">Answers save as you type and lock in when time runs out.</p>
+      <div class="overlay" id="overlay"><div><p style="font-weight:700;font-size:20px">Round ${room.round} starts in</p><div class="big" id="count">3</div></div></div>`;
+    wireChrome();
+    view.pending = {}; view.round = room.round;
+    view.inputs = [...$app.querySelectorAll(".answers input")];
     view.inputs.forEach((el, idx) => {
-      el.addEventListener("input", () => { view.pending[el.dataset.i] = el.value.trim(); clearTimeout(view.t); view.t = setTimeout(flush, 350); });
-      el.addEventListener("blur", flush);
+      el.addEventListener("input", () => { view.pending[el.dataset.i] = el.value.trim(); clearTimeout(view.t); view.t = setTimeout(flushAnswers, 350); });
+      el.addEventListener("blur", flushAnswers);
       el.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); view.inputs[idx + 1]?.focus(); } });
     });
-    refreshAnswering();
-    tick();
+    refreshAnswering(); tick();
   }
-  function flush() {
+  function flushAnswers() {
     if (!view.pending || !Object.keys(view.pending).length || !CODE) return;
-    const r = view.round, upd = {};
-    for (const [i, v] of Object.entries(view.pending)) upd[`answers/${r}/${pid}/${i}`] = v || null;
-    view.pending = {};
-    update(ref(db, roomPath()), upd);
+    const upd = {}; for (const [i, v] of Object.entries(view.pending)) upd[`answers/${view.round}/${pid}/${i}`] = v || null;
+    view.pending = {}; update(G(), upd);
   }
   function refreshAnswering() {
-    const el = document.getElementById("progress"); if (!el) return;
+    const el = $("progress"); if (!el) return;
     const n = arr(room.categories).length;
-    el.innerHTML = playerChips(id => {
+    el.innerHTML = playerIds().map(id => { const p = P(id);
       const filled = Object.values(room.answers?.[room.round]?.[id] || {}).filter(v => v && String(v).trim()).length;
-      return ` <small>${filled}/${n}</small>`;
-    });
+      return `<span class="chip ${id === pid ? "me" : ""} ${p.online ? "" : "off"}">${avOf(id, 26)}${esc(p.name)} <small>${filled}/${n}</small></span>`; }).join("");
   }
 
-  // ---------- Scoring ----------
-  const norm = s => String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "")
-    .replace(/&/g, " and ").replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim();
-  const core = s => norm(s).replace(/^(the|a|an) /, "");
-  const startsRight = (s, L) => { L = (L || "").toLowerCase(); return norm(s).startsWith(L) || core(s).startsWith(L); };
-
   function computeRound(r) {
-    const cats = arr(room.categories);
-    const ans = room.answers?.[r] || {}, votes = room.votes?.[r] || {};
-    const ids = playerIds();
+    const cats = arr(room.categories), ans = room.answers?.[r] || {}, votes = room.votes?.[r] || {}, ids = playerIds();
     const points = Object.fromEntries(ids.map(id => [id, 0]));
     const rows = cats.map((cat, i) => {
       const entries = ids.map(id => ({ id, text: String((ans[id] || {})[i] ?? "").trim() }));
@@ -449,179 +817,468 @@ function main() {
       entries.forEach(e => {
         if (!e.text) { e.empty = true; e.pts = 0; return; }
         const v = (votes[i] || {})[e.id] || {};
-        const vals = Object.values(v);
-        e.ups = vals.filter(x => x === 1).length;
-        e.downs = vals.filter(x => x === -1).length;
-        e.myVote = v[pid] || 0;
+        e.upIds = Object.keys(v).filter(k => v[k] === 1); e.downIds = Object.keys(v).filter(k => v[k] === -1);
+        e.ups = e.upIds.length; e.downs = e.downIds.length; e.myVote = v[pid] || 0;
         e.dup = !!e.key && counts[e.key] > 1;
-        e.wrong = !startsRight(e.text, room.letter);
+        const L = (room.letter || "").toLowerCase();
+        e.wrong = !(norm(e.text).startsWith(L) || core(e.text).startsWith(L));
         e.valid = e.wrong ? e.ups > e.downs : e.downs <= e.ups;
         e.pts = !e.dup && e.valid ? 1 : 0;
-        points[e.id] = (points[e.id] || 0) + e.pts;
+        points[e.id] += e.pts;
       });
-      // answered first, then empties
       entries.sort((a, b) => (a.empty ? 1 : 0) - (b.empty ? 1 : 0));
       return { cat, i, entries };
     });
     return { rows, points };
   }
-  function totals() {
-    const t = Object.fromEntries(playerIds().map(id => [id, 0]));
-    for (const [, scores] of entriesOf(room.roundScores)) for (const [id, v] of entriesOf(scores)) t[id] = (t[id] || 0) + (v || 0);
-    return t;
-  }
 
-  // ---------- Voting ----------
   function renderVoting() {
-    $app.innerHTML = `
-      ${topbar()}
-      <div class="stage"><div class="letter">${esc(room.letter)}</div>
-        <div><h2 style="margin:0">Time to vote</h2><div style="color:var(--muted);font-size:14px">Duplicates score 0. More 👎 than 👍 means no point.</div></div></div>
+    $app.innerHTML = `${topbar()}
+      <div class="card" style="margin-bottom:20px"><div class="stage"><div class="die">${esc(room.letter)}</div>
+        <div><h2>Time to vote</h2><p class="muted" style="margin-top:6px">Duplicates score nothing. An answer with more 👎 than 👍 doesn't count.</p></div></div></div>
       <div id="votelist"></div>
       <div class="dock"><div class="inner">
         <div class="status" id="donestatus"></div>
-        ${isHost() ? `<button class="small" id="force" title="Skip waiting for everyone">Skip</button>` : ""}
-        <button class="go" id="done">I'm done voting</button>
-      </div></div>`;
-    wireCopy();
-    document.getElementById("votelist").addEventListener("click", e => {
+        ${isHost() ? `<button class="btn sm" id="force">Skip ahead</button>` : ""}
+        <button class="btn good" id="done">I'm done voting</button></div></div>`;
+    wireChrome();
+    $("votelist").addEventListener("click", e => {
       const b = e.target.closest("button[data-v]"); if (!b) return;
-      const { c, o, v } = b.dataset, val = Number(v);
-      const cur = room.votes?.[room.round]?.[c]?.[o]?.[pid] || 0;
-      set(ref(db, roomPath(`votes/${room.round}/${c}/${o}/${pid}`)), cur === val ? null : val);
+      const { c, o, v } = b.dataset, val = Number(v), cur = room.votes?.[room.round]?.[c]?.[o]?.[pid] || 0;
+      Sound.play("pop"); set(G(`votes/${room.round}/${c}/${o}/${pid}`), cur === val ? null : val);
     });
-    document.getElementById("done").addEventListener("click", () =>
-      set(ref(db, roomPath(`players/${pid}/done`)), !room.players[pid]?.done));
-    document.getElementById("force")?.addEventListener("click", () => {
-      if (confirm("Move on without waiting for everyone?")) finalizeRound();
+    $("done").addEventListener("click", () => {
+      const mine = !!P(pid).done, upd = { [`players/${pid}/done`]: !mine };
+      if (isHost() && !mine && !room.votingEndsAt) upd.votingEndsAt = now() + S().voteTime * 1000;
+      update(G(), upd);
     });
+    $("force")?.addEventListener("click", () => { if (confirm("Move on without waiting for everyone?")) finalizeRound(); });
     refreshVoting();
   }
+  function voterChips(ids, cls) { return ids.map(id => `<span class="voter ${cls}" title="${esc(nameOf(id))}">${avOf(id, 20)}${esc(nameOf(id))}</span>`).join(""); }
   function refreshVoting() {
-    const list = document.getElementById("votelist"); if (!list) return;
+    const list = $("votelist"); if (!list) return;
     const { rows, points } = computeRound(room.round);
     list.innerHTML = rows.map(({ cat, i, entries }) => `
-      <div class="cat card" style="padding:14px">
-        <h3>${i + 1}. ${esc(cat)}</h3>
-        ${entries.map(e => e.empty ? `
-          <div class="ans empty"><div><span class="txt">—</span></div><div class="who">${esc(nameOf(e.id))}</div></div>` : `
+      <section class="card cat"><h3>${i + 1}. ${esc(cat)}</h3>
+        ${entries.map(e => e.empty ? `<div class="ans empty"><div class="who">${avOf(e.id, 24)}<span>${esc(nameOf(e.id))}</span></div><div class="muted">No answer</div></div>` : `
           <div class="ans ${e.dup ? "dup" : !e.valid ? "invalid" : ""}">
-            <div><span class="txt">${esc(e.text)}</span>
-              ${e.dup ? `<span class="tag dup">Duplicate</span>` : ""}
-              ${e.wrong ? `<span class="tag wrong">Wrong letter?</span>` : ""}
-              <span class="tag ${e.pts ? "pt" : "zero"}">${e.pts ? "+1" : "0"}</span></div>
-            <div class="votes">${e.id === pid
-              ? `<span class="mine">your answer · 👍${e.ups} 👎${e.downs}</span>`
-              : `<button class="up ${e.myVote === 1 ? "on" : ""}" data-c="${i}" data-o="${e.id}" data-v="1">👍 ${e.ups}</button>
-                 <button class="down ${e.myVote === -1 ? "on" : ""}" data-c="${i}" data-o="${e.id}" data-v="-1">👎 ${e.downs}</button>`}</div>
-            <div class="who">${esc(nameOf(e.id))}${e.id === pid ? " (you)" : ""}</div>
+            <div class="who">${avOf(e.id, 30)}<span>${esc(nameOf(e.id))}${e.id === pid ? " (you)" : ""}</span></div>
+            <div><span class="txt">${esc(e.text)}</span>${e.dup ? `<span class="tag dup">Duplicate</span>` : ""}${e.wrong ? `<span class="tag wrong">Wrong letter?</span>` : ""}<span class="tag ${e.pts ? "pt" : ""}">${e.pts ? "+1" : "0"}</span></div>
+            <div class="votes">${e.id === pid ? `<span class="mine">Your answer</span>` : `
+              <button class="btn sm vote up ${e.myVote === 1 ? "on" : ""}" data-c="${i}" data-o="${e.id}" data-v="1" aria-pressed="${e.myVote === 1}" aria-label="Thumbs up, ${e.ups}">👍 ${e.ups}</button>
+              <button class="btn sm vote down ${e.myVote === -1 ? "on" : ""}" data-c="${i}" data-o="${e.id}" data-v="-1" aria-pressed="${e.myVote === -1}" aria-label="Thumbs down, ${e.downs}">👎 ${e.downs}</button>`}</div>
+            ${e.ups || e.downs ? `<div class="voters">${voterChips(e.upIds, "up")}${voterChips(e.downIds, "down")}</div>` : ""}
           </div>`).join("")}
-      </div>`).join("") + `
-      <div class="card" style="padding:14px"><h3>This round so far</h3>
-        <div class="chips">${playerIds().map(id => `<span class="chip">${esc(nameOf(id))} <small>+${points[id] || 0}</small></span>`).join("")}</div></div>`;
-    const on = onlineIds(), done = on.filter(id => room.players[id].done);
-    const waiting = on.filter(id => !room.players[id].done).map(nameOf);
-    document.getElementById("donestatus").innerHTML = `<b>${done.length}/${on.length}</b> done` +
-      (waiting.length && waiting.length <= 3 ? ` · waiting on ${waiting.map(esc).join(", ")}` : "");
-    const btn = document.getElementById("done"), me = room.players[pid]?.done;
-    btn.textContent = me ? "Done ✓ (tap to undo)" : "I'm done voting";
-    btn.classList.toggle("isdone", !!me);
+      </section>`).join("") + `
+      <section class="card cat"><h3>This round so far</h3><div class="progress" style="margin-top:8px">
+        ${playerIds().map(id => `<span class="chip ${id === pid ? "me" : ""}">${avOf(id, 26)}${esc(nameOf(id))} <small>+${points[id] || 0}</small></span>`).join("")}</div></section>`;
+    updateVoteDock();
   }
-
+  function updateVoteDock() {
+    const st = $("donestatus"); if (!st) return;
+    const on = onlineIds(), done = on.filter(id => P(id).done), waiting = on.filter(id => !P(id).done).map(nameOf);
+    let clock = room.votingEndsAt
+      ? `<span class="clock ${room.votingEndsAt - now() <= 10000 ? "low" : ""}" id="voteclock">Moving on in ${fmt(room.votingEndsAt - now())}</span>`
+      : `<span class="muted">The ${S().voteTime}s timer starts when ${esc(nameOf(hostId()))} is done</span>`;
+    st.innerHTML = `<b>${done.length} of ${on.length} done</b>${waiting.length && waiting.length <= 3 ? ` <span class="muted">(waiting on ${waiting.map(esc).join(", ")})</span>` : ""}<br>${clock}`;
+    const btn = $("done"), me = !!P(pid).done;
+    btn.textContent = me ? "Done (tap to undo)" : "I'm done voting"; btn.classList.toggle("good", !me);
+  }
   function finalizeRound() {
-    const r = room.round;
-    if (acted === `final:${r}`) return;
-    acted = `final:${r}`;
-    const { points } = computeRound(r);
-    const upd = {};
-    for (const id of playerIds()) upd[`roundScores/${r}/${id}`] = points[id] || 0;
-    const last = r >= room.settings.rounds;
-    upd.phase = last ? "final" : "scores";
-    upd.nextAt = now() + 12000;
-    update(ref(db, roomPath()), upd);
+    const r = room.round; if (acted === `final:${r}`) return; acted = `final:${r}`;
+    const { points } = computeRound(r), upd = {};
+    for (const id of playerIds()) upd[`scores/s${r}/${id}`] = points[id] || 0;
+    upd.phase = r >= S().rounds ? "final" : "scores"; upd.nextAt = now() + 12000;
+    update(G(), upd);
   }
-
-  // ---------- Scores / Final ----------
   function renderScores() {
-    const r = room.round, isFinal = room.phase === "final";
-    const tot = totals(), rs = room.roundScores?.[r] || {};
-    const ids = playerIds().sort((a, b) => (tot[b] || 0) - (tot[a] || 0));
-    const best = tot[ids[0]] || 0;
-    const winners = ids.filter(id => (tot[id] || 0) === best);
-    $app.innerHTML = `
-      ${topbar()}
-      <div class="card">
-        ${isFinal ? `<div class="trophy">🏆</div><div class="winner">${winners.map(id => esc(nameOf(id))).join(" & ")} win${winners.length > 1 ? "" : "s"}!</div>`
-                  : `<h2 style="margin-top:0">Round ${r} results</h2>`}
-        <table><thead><tr><th>Player</th><th class="num">This round</th><th class="num">Total</th></tr></thead><tbody>
-          ${ids.map(id => `<tr><td>${esc(nameOf(id))}${id === pid ? " (you)" : ""}</td><td class="num">+${rs[id] || 0}</td><td class="num"><b>${tot[id] || 0}</b></td></tr>`).join("")}
-        </tbody></table>
-        <div style="margin-top:18px">
-          ${isFinal
-            ? (isHost() ? `<button class="primary" id="again">Play again</button>` : `<div class="waiting">Waiting for ${esc(nameOf(hostId()))} to start a new game…</div>`)
-            : `<div class="waiting" id="nextin">Next round soon…</div>${isHost() ? `<button class="primary" id="now">Start next round now</button>` : ""}`}
-        </div>
-      </div>`;
-    wireCopy();
-    document.getElementById("now")?.addEventListener("click", () => { acted = `start:${r}`; startRound(); });
-    document.getElementById("again")?.addEventListener("click", () => update(ref(db, roomPath()), {
-      phase: "lobby", round: 0, usedLetters: null, answers: null, votes: null, roundScores: null,
-      categories: null, letter: null, nextAt: null, roundStartsAt: null, roundEndsAt: null
-    }));
+    const r = room.round, tot = totals(), rs = room.scores?.[`s${r}`] || {};
+    const ids = playerIds().sort((a, b) => (tot[b] || 0) - (tot[a] || 0)), max = Math.max(1, ...ids.map(id => tot[id] || 0));
+    $app.innerHTML = `${topbar()}
+      <section class="card pop-target" style="max-width:640px;margin:0 auto">
+        <h2>Round ${r} results</h2>
+        <table class="scoretable"><tbody>${ids.map(id => `<tr><td><span class="pcell">${avOf(id, 34)}${esc(nameOf(id))}${id === pid ? " (you)" : ""}</span></td>
+          <td style="width:30%"><div class="bar"><i style="width:${(tot[id] || 0) / max * 100}%"></i></div></td>
+          <td class="num plus">+${rs[id] || 0}</td><td class="num">${tot[id] || 0}</td></tr>`).join("")}</tbody></table>
+        <p class="waiting" id="nextin">Next round soon</p>
+        ${isHost() ? `<button class="btn primary wide" id="now">Start next round now</button>` : ""}
+      </section>`;
+    wireChrome(); Sound.play("end");
+    $("now")?.addEventListener("click", () => { acted = `start:${r}`; startRound(); });
   }
 
-  // ---------- Clock: timers + host automation ----------
-  function fmt(ms) { const s = Math.max(0, Math.ceil(ms / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; }
+  /* =================================================================== */
+  /*  Final (both games)                                                  */
+  /* =================================================================== */
+  function renderFinal() {
+    const tot = totals(), ids = playerIds().sort((a, b) => (tot[b] || 0) - (tot[a] || 0));
+    const best = tot[ids[0]] || 0, winners = ids.filter(id => (tot[id] || 0) === best);
+    const pod = (id, n) => id ? `<div class="pod p${n}">${avOf(id, n === 1 ? 84 : 64)}<span class="pname">${esc(nameOf(id))}</span><span class="pts">${tot[id] || 0} pts</span><div class="block">${n}</div></div>` : "";
+    $app.innerHTML = `${topbar()}
+      <section class="card pop-target" style="max-width:680px;margin:0 auto">
+        <p class="winner">${winners.map(id => esc(nameOf(id))).join(" & ")} win${winners.length > 1 ? "" : "s"}!</p>
+        <p class="muted" style="text-align:center">${room.mode === "draw" ? "Sketch & Guess" : "Scattergories"} final scores</p>
+        <div class="podium">${pod(ids[1], 2)}${pod(ids[0], 1)}${pod(ids[2], 3)}</div>
+        ${ids.length > 3 ? `<table class="scoretable"><tbody>${ids.slice(3).map((id, i) => `<tr><td>${i + 4}</td><td><span class="pcell">${avOf(id, 30)}${esc(nameOf(id))}</span></td><td class="num">${tot[id] || 0}</td></tr>`).join("")}</tbody></table>` : ""}
+        <div style="margin-top:20px">${isHost() ? `<button class="btn primary wide" id="again">Back to the lobby</button>` : `<p class="waiting">${esc(nameOf(hostId()))} can take everyone back to the lobby</p>`}</div>
+      </section>`;
+    wireChrome(); confetti(); Sound.play("good");
+    $("again")?.addEventListener("click", resetToLobby);
+  }
+
+  /* =================================================================== */
+  /*  Sketch & Guess                                                      */
+  /* =================================================================== */
+  const customWords = () => String(S().customWords || "").split(",").map(w => w.trim().toLowerCase()).filter(w => w && w.length <= 30);
+  function wordPool() {
+    const custom = customWords(), used = arr(room.usedWords);
+    let pool = +S().customOnly ? custom : [...WORDS, ...custom, ...custom];
+    const fresh = pool.filter(w => !used.includes(w));
+    return fresh.length >= 3 ? fresh : pool;
+  }
+  function startDrawGame() {
+    const order = shuffle(onlineIds());
+    remove(chatRef());
+    startTurn(1, 0, order, { mode: "draw", scores: null, usedWords: null });
+  }
+  function nextOrder(prev) {
+    const on = onlineIds(), kept = prev.filter(id => on.includes(id));
+    return [...kept, ...on.filter(id => !kept.includes(id))];
+  }
+  function startTurn(round, turn, order, extra = {}) {
+    let guard = 0;
+    while (guard++ < 50) {
+      if (turn >= order.length) { round++; turn = 0; order = nextOrder(order); }
+      if (round > S().drawRounds) { update(G(), { ...extra, phase: "final" }); return; }
+      if (P(order[turn]).online) break;
+      turn++;
+    }
+    const drawer = order[turn], pool = shuffle(wordPool().slice()), choices = [...new Set(pool)].slice(0, 3), t = now();
+    remove(strokesRef());
+    update(G(), { ...extra, phase: "d_choose", round, turn, order,
+      draw: { tk: `${round}_${turn}`, drawer, choices }, chooseEndsAt: t + 15000, turnEndsAt: null, turnStartsAt: null, revealEndsAt: null });
+    if (turn === 0) push(chatRef(), { kind: "sys", text: `Round ${round} begins`, at: serverTimestamp() });
+  }
+  function chooseWord(w) {
+    const t = now(), d = room.draw;
+    if (room.phase !== "d_choose" || !d || acted === `choose:${d.tk}`) return;
+    acted = `choose:${d.tk}`;
+    update(G(), { phase: "d_draw", "draw/word": w, "draw/reveal": null, turnStartsAt: t, turnEndsAt: t + S().drawTime * 1000, usedWords: [...arr(room.usedWords), w] });
+    push(chatRef(), { kind: "sys", text: `${nameOf(d.drawer)} is drawing now`, at: serverTimestamp() });
+  }
+  function endTurn() {
+    const d = room.draw; if (!d || acted === `end:${d.tk}`) return; acted = `end:${d.tk}`;
+    const guessed = d.guessed || {}, others = playerIds().filter(id => id !== d.drawer && P(id).online);
+    const sc = {}; let sum = 0;
+    for (const [id, g] of Object.entries(guessed)) { sc[id] = g.pts || 0; sum += g.pts || 0; }
+    const n = Object.keys(guessed).length;
+    sc[d.drawer] = n ? Math.round(sum / Math.max(1, others.length) * .8) + (n >= others.length ? 30 : 0) : 0;
+    update(G(), { phase: "d_reveal", revealEndsAt: now() + 7000, [`scores/d${d.tk}`]: sc });
+    push(chatRef(), { kind: "sys", text: `The word was "${d.word || "?"}"`, at: serverTimestamp() });
+  }
+  function nextTurn() {
+    const d = room.draw; if (!d || acted === `next:${d.tk}`) return; acted = `next:${d.tk}`;
+    startTurn(room.round, room.turn + 1, arr(room.order));
+  }
+  const isDrawer = () => room.draw?.drawer === pid;
+  const canDraw = () => room.phase === "d_draw" && isDrawer();
+
+  function hintHTML() {
+    const d = room.draw || {}, w = d.word || "";
+    if (room.phase === "d_choose") return isDrawer() ? "Pick a word" : `${esc(nameOf(d.drawer))} is choosing`;
+    if (room.phase === "d_reveal" || isDrawer() || d.guessed?.[pid]) return `${esc(w)}<small>${isDrawer() && room.phase === "d_draw" ? "Your word to draw" : "The word"}</small>`;
+    const rev = arr(d.reveal);
+    const shown = [...w].map((ch, i) => ch === " " ? "&nbsp;&nbsp;" : ch === "-" ? "-" : rev.includes(i) ? esc(ch) : "_").join("");
+    const lens = w.split(/[\s]+/).map(p => p.length).join(", ");
+    return `${shown}<small>${lens} letters</small>`;
+  }
+  function renderDraw() {
+    $app.innerHTML = `${topbar()}
+      <div class="card dhead">${ringHTML("dring")}<div class="hintword" id="hint" aria-live="polite"></div><span class="roundinfo muted" id="turninfo"></span></div>
+      <div class="dgrid">
+        <aside class="card flat dplayers" id="dplayers" aria-label="Players"></aside>
+        <main>
+          <div class="canvasbox" id="cvbox"><canvas id="cv" width="${CW}" height="${CH}" aria-label="Drawing board"></canvas><div class="cvov" id="cvov" hidden></div></div>
+          <div class="card flat tools" id="tools" hidden>
+            <div class="palette" role="group" aria-label="Colors">${PALETTE.map(c => `<button class="pcol" data-col="${c}" style="background:${c}" aria-label="Color ${c}" aria-pressed="${c === tool.color}"></button>`).join("")}</div>
+            <div class="sizes" role="group" aria-label="Brush size">${SIZES.map(s => `<button class="tbtn" data-size="${s}" aria-label="Brush size ${s}" aria-pressed="${s === tool.size}"><span class="dot" style="width:${Math.min(28, s * .7 + 3)}px;height:${Math.min(28, s * .7 + 3)}px"></span></button>`).join("")}</div>
+            <div class="toolset" role="group" aria-label="Tools">
+              <button class="tbtn" data-tool="pen" aria-label="Pen" aria-pressed="${tool.mode === "pen"}">✏️</button>
+              <button class="tbtn" data-tool="fill" aria-label="Fill bucket" aria-pressed="${tool.mode === "fill"}">🪣</button>
+              <button class="tbtn" data-tool="eraser" aria-label="Eraser" aria-pressed="${tool.mode === "eraser"}">🧽</button></div>
+            <div class="toolset"><button class="tbtn" id="undo" aria-label="Undo">↩️</button><button class="tbtn" id="clear" aria-label="Clear the board">🗑️</button></div>
+          </div>
+          <div class="react" id="react" hidden></div>
+        </main>
+        <aside class="card flat chat" aria-label="Guesses and chat">
+          <div class="chatlog" id="chatlog" aria-live="polite"></div>
+          <form class="chatform" id="chatform"><input id="chatin" maxlength="100" autocomplete="off" placeholder="Type your guess" aria-label="Guess or chat"></form>
+        </aside>
+      </div>`;
+    wireChrome(); wireCanvas(); wireTools();
+    $("chatform").addEventListener("submit", e => { e.preventDefault(); const i = $("chatin"); sendChat(i.value); i.value = ""; });
+    $("react").addEventListener("click", e => {
+      const b = e.target.closest("[data-react]"); if (!b || !room.draw) return;
+      const v = +b.dataset.react, cur = room.draw.react?.[pid] || 0; Sound.play("pop");
+      set(G(`draw/react/${pid}`), cur === v ? null : v);
+    });
+    $("cvov").addEventListener("click", e => { const b = e.target.closest("[data-word]"); if (b && isDrawer()) chooseWord(b.dataset.word); });
+    view.prevGuessed = Object.keys(room.draw?.guessed || {}).length;
+    baseDirty = true; schedulePaint(); renderChat(); refreshDraw(); tick();
+  }
+  function refreshDraw() {
+    const d = room.draw || {}; if (!$("hint")) return;
+    const phase = room.phase;
+    if (view.hintPhase !== phase + (d.word || "") + arr(d.reveal).length + !!d.guessed?.[pid]) { $("hint").innerHTML = hintHTML(); view.hintPhase = phase + (d.word || "") + arr(d.reveal).length + !!d.guessed?.[pid]; }
+    $("turninfo").textContent = `Turn ${(room.turn || 0) + 1} of ${arr(room.order).length}`;
+    // players
+    const tot = totals(), g = d.guessed || {};
+    const ids = playerIds().sort((a, b) => (tot[b] || 0) - (tot[a] || 0));
+    $("dplayers").innerHTML = ids.map(id => { const p = P(id), live = phase === "d_draw" && g[id] ? g[id].pts : 0;
+      return `<div class="dp ${id === pid ? "me" : ""} ${id === d.drawer ? "drawing" : g[id] ? "got" : ""} ${p.online ? "" : "off"}">${avOf(id, 36)}
+        <div class="info"><div class="nm">${esc(p.name)}${id === pid ? " (you)" : ""}</div><div class="sc">${tot[id] || 0} pts${live ? ` <b style="color:#13804a">+${live}</b>` : ""}</div></div>
+        <span class="st" aria-label="${id === d.drawer ? "Drawing" : g[id] ? "Guessed it" : ""}">${id === d.drawer ? "✏️" : g[id] ? "✅" : ""}</span></div>`; }).join("");
+    // overlay
+    const ov = $("cvov");
+    if (phase === "d_choose") {
+      ov.hidden = false;
+      const key = `choose:${d.tk}:${isDrawer()}`;
+      if (view.ovKey !== key) { view.ovKey = key;
+        ov.innerHTML = isDrawer()
+          ? `<div><h2>Pick a word to draw</h2><div class="choices">${arr(d.choices).map(w => `<button class="btn primary" data-word="${esc(w)}">${esc(w)}</button>`).join("")}</div></div>`
+          : `<div>${avOf(d.drawer, 96)}<h2 style="margin-top:12px">${esc(nameOf(d.drawer))} is picking a word</h2></div>`; }
+    } else if (phase === "d_reveal") {
+      ov.hidden = false;
+      const key = `reveal:${d.tk}`;
+      if (view.ovKey !== key) { view.ovKey = key; Sound.play("end");
+        const sc = room.scores?.[`d${d.tk}`] || {};
+        const rows = Object.entries(sc).sort((a, b) => b[1] - a[1]).map(([id, v]) => `<div><span>${esc(nameOf(id))}${id === d.drawer ? " (drew)" : ""}</span><span>+${v}</span></div>`).join("");
+        ov.innerHTML = `<div><h2>The word was <span class="reveal-word">${esc(d.word || "?")}</span></h2>
+          <div class="turnpts">${rows || `<div><span>Nobody got it this time</span></div>`}</div><p style="margin-top:14px;opacity:.85" id="nextturn"></p></div>`; }
+    } else { ov.hidden = true; view.ovKey = ""; }
+    // tools / canvas
+    $("tools").hidden = !canDraw();
+    $("cvbox").classList.toggle("can-draw", canDraw());
+    // reactions
+    const rx = $("react"), showReact = (phase === "d_draw" || phase === "d_reveal") && d.word;
+    rx.hidden = !showReact;
+    if (showReact) {
+      const r = d.react || {}, ups = Object.keys(r).filter(k => r[k] === 1), downs = Object.keys(r).filter(k => r[k] === -1), mine = r[pid] || 0;
+      rx.innerHTML = (isDrawer() ? `<span>Reactions to your drawing</span>` : `<span>Rate this drawing</span>
+        <button class="btn sm vote up ${mine === 1 ? "on" : ""}" data-react="1" aria-pressed="${mine === 1}">👍 ${ups.length}</button>
+        <button class="btn sm vote down ${mine === -1 ? "on" : ""}" data-react="-1" aria-pressed="${mine === -1}">👎 ${downs.length}</button>`) +
+        `<span class="voters" style="grid-column:auto">${voterChips(ups, "up")}${voterChips(downs, "down")}</span>`;
+    }
+    // chat input
+    const ci = $("chatin"), drawing = phase === "d_draw";
+    ci.disabled = drawing && isDrawer();
+    ci.placeholder = drawing && isDrawer() ? "You're drawing, no hints" : drawing && g[pid] ? "Chat with others who got it" : drawing ? "Type your guess" : "Chat";
+    // guess sounds
+    const n = Object.keys(g).length;
+    if (n > (view.prevGuessed || 0)) { Sound.play("good"); }
+    view.prevGuessed = n;
+    renderChat();
+  }
+
+  /* ---------- guessing & chat ---------- */
+  let chatMsgs = [];
+  function sendChat(text) {
+    text = String(text || "").trim().slice(0, 100); if (!text || !room) return;
+    const d = room.draw || {}, drawing = room.phase === "d_draw", got = !!d.guessed?.[pid];
+    if (drawing && isDrawer()) return;
+    const nt = norm(text), nw = norm(d.word || "");
+    if (drawing && !got && nw && nt === nw) {
+      const frac = clamp((room.turnEndsAt - now()) / (S().drawTime * 1000), 0, 1);
+      const order = Object.keys(d.guessed || {}).length;
+      const pts = Math.max(30, Math.round(60 + 340 * frac) - order * 15);
+      update(G(), { [`draw/guessed/${pid}`]: { pts, at: serverTimestamp() } });
+      push(chatRef(), { kind: "good", text: `${nameOf(pid)} guessed the word`, at: serverTimestamp() });
+      toast(`You got it! +${pts}`, "good"); confetti(60);
+      return;
+    }
+    if (drawing && got && nw && nt.includes(nw)) { toast("Keep the word secret"); return; }
+    push(chatRef(), { kind: "msg", pid, text, g: drawing && got ? 1 : 0, tk: d.tk || "", at: serverTimestamp() });
+    if (drawing && !got && nw.length >= 4 && lev(nt, nw) === 1) toast(`"${text}" is really close`);
+  }
+  function renderChat() {
+    const log = $("chatlog"); if (!log || !room) return;
+    const d = room.draw || {}, priv = isDrawer() || !!d.guessed?.[pid] || room.phase !== "d_draw";
+    const atBottom = log.scrollHeight - log.scrollTop - log.clientHeight < 60;
+    log.innerHTML = chatMsgs.filter(m => !m.g || m.tk !== d.tk || priv).map(m =>
+      m.kind === "sys" ? `<div class="cm sys">${esc(m.text)}</div>` :
+      m.kind === "good" ? `<div class="cm good">${esc(m.text)}</div>` :
+      `<div class="cm ${m.g ? "hidden" : ""}">${avOf(m.pid, 22)}<span><b>${esc(nameOf(m.pid))}</b> ${esc(m.text)}</span></div>`).join("");
+    if (atBottom || view.chatFirst !== true) { log.scrollTop = log.scrollHeight; view.chatFirst = true; }
+  }
+
+  /* ---------- canvas engine ---------- */
+  const tool = { color: PALETTE[0], size: SIZES[1], mode: "pen" };
+  const strokes = new Map();
+  const base = document.createElement("canvas"); base.width = CW; base.height = CH;
+  const bctx = base.getContext("2d", { willReadFrequently: true });
+  let baseKeys = [], baseDirty = true, paintQueued = false, cur = null, sendTimer = null;
+  function onStroke(type, key, val) {
+    if (cur && key === cur.key && type !== "remove") return;
+    if (type === "remove") strokes.delete(key); else strokes.set(key, val);
+    if (baseKeys.includes(key)) baseDirty = true;
+    schedulePaint();
+  }
+  function schedulePaint() { if (!paintQueued) { paintQueued = true; requestAnimationFrame(paint); } }
+  function paint() {
+    paintQueued = false;
+    const keys = [...strokes.keys()].sort(), target = keys.slice(0, -1);
+    if (!baseDirty) for (let i = 0; i < baseKeys.length; i++) if (baseKeys[i] !== target[i]) { baseDirty = true; break; }
+    if (baseDirty) { bctx.fillStyle = "#fff"; bctx.fillRect(0, 0, CW, CH); baseKeys = []; baseDirty = false; }
+    for (let i = baseKeys.length; i < target.length; i++) { drawStroke(bctx, strokes.get(target[i])); baseKeys.push(target[i]); }
+    const cv = $("cv"); if (!cv) return;
+    const ctx = cv.getContext("2d", { willReadFrequently: true });
+    ctx.drawImage(base, 0, 0);
+    if (keys.length) drawStroke(ctx, strokes.get(keys[keys.length - 1]));
+  }
+  function drawStroke(ctx, s) {
+    if (!s) return; const p = arr(s.p);
+    if (s.t === "f") { floodFill(ctx, p[0], p[1], s.c); return; }
+    ctx.strokeStyle = ctx.fillStyle = s.c; ctx.lineWidth = s.w; ctx.lineCap = "round"; ctx.lineJoin = "round";
+    if (p.length < 2) return;
+    if (p.length <= 3) { ctx.beginPath(); ctx.arc(p[0], p[1], s.w / 2, 0, Math.PI * 2); ctx.fill(); return; }
+    ctx.beginPath(); ctx.moveTo(p[0], p[1]);
+    for (let i = 2; i < p.length - 2; i += 2) ctx.quadraticCurveTo(p[i], p[i + 1], (p[i] + p[i + 2]) / 2, (p[i + 1] + p[i + 3]) / 2);
+    ctx.lineTo(p[p.length - 2], p[p.length - 1]); ctx.stroke();
+  }
+  function floodFill(ctx, x, y, hex) {
+    x = Math.round(x); y = Math.round(y); if (x < 0 || y < 0 || x >= CW || y >= CH) return;
+    const img = ctx.getImageData(0, 0, CW, CH), d = img.data;
+    const r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
+    const i0 = (y * CW + x) * 4, tr = d[i0], tg = d[i0 + 1], tb = d[i0 + 2];
+    if (Math.abs(tr - r) + Math.abs(tg - g) + Math.abs(tb - b) < 8) return;
+    const seen = new Uint8Array(CW * CH), tol = 110;
+    const match = k => !seen[k] && Math.abs(d[k * 4] - tr) + Math.abs(d[k * 4 + 1] - tg) + Math.abs(d[k * 4 + 2] - tb) <= tol;
+    const stack = [x, y];
+    while (stack.length) {
+      const py = stack.pop(), px = stack.pop(); const row = py * CW;
+      if (!match(row + px)) continue;
+      let lx = px, rx = px;
+      while (lx > 0 && match(row + lx - 1)) lx--;
+      while (rx < CW - 1 && match(row + rx + 1)) rx++;
+      let upOpen = false, dnOpen = false;
+      for (let i = lx; i <= rx; i++) {
+        const k = row + i; seen[k] = 1; const j = k * 4; d[j] = r; d[j + 1] = g; d[j + 2] = b; d[j + 3] = 255;
+        if (py > 0) { const m = match(k - CW); if (m && !upOpen) stack.push(i, py - 1); upOpen = m; }
+        if (py < CH - 1) { const m = match(k + CW); if (m && !dnOpen) stack.push(i, py + 1); dnOpen = m; }
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+  }
+  function wireCanvas() {
+    const cv = $("cv");
+    const pos = e => { const r = cv.getBoundingClientRect(); return [Math.round((e.clientX - r.left) / r.width * CW), Math.round((e.clientY - r.top) / r.height * CH)]; };
+    const send = () => { if (!cur) return; const { ref: r, s } = cur; set(r, { ...s, p: s.p.slice() }); };
+    cv.addEventListener("pointerdown", e => {
+      if (!canDraw()) return; e.preventDefault(); cv.setPointerCapture?.(e.pointerId);
+      const [x, y] = pos(e), r = push(strokesRef());
+      if (tool.mode === "fill") { const s = { t: "f", c: tool.color, p: [x, y] }; strokes.set(r.key, s); set(r, s); schedulePaint(); return; }
+      cur = { ref: r, key: r.key, s: { t: "p", c: tool.mode === "eraser" ? "#ffffff" : tool.color, w: tool.size, p: [x, y] } };
+      strokes.set(r.key, cur.s); schedulePaint(); send();
+    });
+    cv.addEventListener("pointermove", e => {
+      if (!cur) return;
+      const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+      for (const ev of evs) { const [x, y] = pos(ev), p = cur.s.p; if (Math.hypot(x - p[p.length - 2], y - p[p.length - 1]) >= 2) p.push(clamp(x, -20, CW + 20), clamp(y, -20, CH + 20)); }
+      schedulePaint();
+      if (!sendTimer) sendTimer = setTimeout(() => { sendTimer = null; send(); }, 70);
+    });
+    const end = () => { if (!cur) return; clearTimeout(sendTimer); sendTimer = null; send(); cur = null; };
+    cv.addEventListener("pointerup", end); cv.addEventListener("pointercancel", end); cv.addEventListener("lostpointercapture", end);
+  }
+  function wireTools() {
+    const t = $("tools");
+    t.addEventListener("click", e => {
+      const b = e.target.closest("button"); if (!b) return;
+      if (b.dataset.col) { tool.color = b.dataset.col; if (tool.mode === "eraser") tool.mode = "pen"; }
+      if (b.dataset.size) tool.size = +b.dataset.size;
+      if (b.dataset.tool) tool.mode = b.dataset.tool;
+      if (b.id === "undo") { const keys = [...strokes.keys()].sort(); if (keys.length) remove(ref(db, `rooms/${CODE}/strokes/${keys[keys.length - 1]}`)); }
+      if (b.id === "clear") remove(strokesRef());
+      t.querySelectorAll("[data-col]").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.col === tool.color)));
+      t.querySelectorAll("[data-size]").forEach(x => x.setAttribute("aria-pressed", String(+x.dataset.size === tool.size)));
+      t.querySelectorAll("[data-tool]").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.tool === tool.mode)));
+    });
+  }
+
+  /* =================================================================== */
+  /*  Clock: timers + host automation                                     */
+  /* =================================================================== */
   function tick() {
     if (!room || !CODE) return;
-    const t = now();
+    const t = now(), host = isHost(), s = S();
+    // ----- Scattergories -----
     if (room.phase === "answering" && view.inputs) {
-      const ov = document.getElementById("overlay"), timer = document.getElementById("timer");
+      const ov = $("overlay"), die = $("die");
       if (t < room.roundStartsAt) {
-        ov.style.display = "grid";
-        document.getElementById("count").textContent = Math.ceil((room.roundStartsAt - t) / 1000);
+        ov.style.display = "grid"; $("count").textContent = Math.ceil((room.roundStartsAt - t) / 1000);
+        die.textContent = pick(LETTERS); setRing("ring", s.timer * 1000, s.timer * 1000);
       } else {
         ov.style.display = "none";
-        document.getElementById("letter").textContent = room.letter;
-        if (t < room.roundEndsAt) {
+        if (!view.landed) { view.landed = true; die.textContent = room.letter; die.classList.remove("rolling"); die.classList.add("landed"); Sound.play("start"); }
+        const left = room.roundEndsAt - t; setRing("ring", left, s.timer * 1000);
+        if (left > 0) {
+          tickSound(left);
           if (!view.started) { view.started = true; view.inputs.forEach(i => (i.disabled = false)); if (!("ontouchstart" in window)) view.inputs[0]?.focus(); }
-          const left = room.roundEndsAt - t;
-          timer.textContent = fmt(left);
-          timer.className = "timer" + (left <= 10000 ? " low" : "");
         } else if (!view.locked) {
           view.locked = true;
           view.inputs.forEach(i => { if (i.value.trim() !== String(myAnswers()[i.dataset.i] ?? "")) view.pending[i.dataset.i] = i.value.trim(); i.disabled = true; });
-          flush();
-          timer.textContent = "Time's up!"; timer.className = "timer over";
+          flushAnswers(); Sound.play("end"); toast("Time's up. Answers locked in.");
         }
       }
     }
-    if (room.phase === "scores") {
-      const el = document.getElementById("nextin");
-      if (el && room.nextAt) el.textContent = `Next round in ${Math.max(0, Math.ceil((room.nextAt - t) / 1000))}…`;
+    if (room.phase === "voting" && room.votingEndsAt) {
+      const vc = $("voteclock"), left = room.votingEndsAt - t;
+      if (vc) { vc.textContent = `Moving on in ${fmt(left)}`; vc.classList.toggle("low", left <= 10000); } else updateVoteDock();
+      tickSound(left);
     }
-    if (!isHost()) return;
-    // Host-only automation (host = earliest-joined player who's online)
-    if (room.phase === "answering" && t >= room.roundEndsAt + 1500 && acted !== `vote:${room.round}`) {
-      acted = `vote:${room.round}`;
-      update(ref(db, roomPath()), { phase: "voting" });
+    if (room.phase === "scores" && room.nextAt) { const el = $("nextin"); if (el) el.textContent = `Next round in ${Math.max(0, Math.ceil((room.nextAt - t) / 1000))}`; }
+    // ----- Sketch & Guess -----
+    if (room.phase?.startsWith("d_") && $("dring")) {
+      if (room.phase === "d_choose") setRing("dring", room.chooseEndsAt - t, 15000);
+      if (room.phase === "d_draw") { const left = room.turnEndsAt - t; setRing("dring", left, s.drawTime * 1000); tickSound(left); }
+      if (room.phase === "d_reveal") { setRing("dring", room.revealEndsAt - t, 7000); const n = $("nextturn"); if (n) n.textContent = `Next turn in ${Math.max(0, Math.ceil((room.revealEndsAt - t) / 1000))}`; }
     }
+    if (!host) return;
+    // ----- host automation (host = longest-joined player who's online) -----
+    if (room.phase === "answering" && t >= room.roundEndsAt + 1500 && acted !== `vote:${room.round}`) { acted = `vote:${room.round}`; update(G(), { phase: "voting" }); }
     if (room.phase === "voting") {
       const on = onlineIds();
-      if (on.length && on.every(id => room.players[id].done)) finalizeRound();
+      if ((on.length && on.every(id => P(id).done)) || (room.votingEndsAt && t >= room.votingEndsAt)) finalizeRound();
     }
-    if (room.phase === "scores" && room.nextAt && t >= room.nextAt && acted !== `start:${room.round}`) {
-      acted = `start:${room.round}`;
-      startRound();
+    if (room.phase === "scores" && room.nextAt && t >= room.nextAt && acted !== `start:${room.round}`) { acted = `start:${room.round}`; startRound(); }
+    const d = room.draw;
+    if (room.phase === "d_choose" && d) {
+      if (!P(d.drawer).online && acted !== `skip:${d.tk}`) { acted = `skip:${d.tk}`; startTurn(room.round, room.turn + 1, arr(room.order)); }
+      else if (t >= room.chooseEndsAt) chooseWord(pick(arr(d.choices)) || pick(WORDS));
     }
+    if (room.phase === "d_draw" && d) {
+      const others = onlineIds().filter(id => id !== d.drawer), g = d.guessed || {};
+      if (t >= room.turnEndsAt || !P(d.drawer).online || (others.length && others.every(id => g[id]))) endTurn();
+      else if (+s.hints && d.word) {
+        const letters = [...d.word].map((c, i) => /[a-z0-9]/i.test(c) ? i : -1).filter(i => i >= 0);
+        const maxRev = Math.min(3, Math.floor(letters.length / 3)), frac = (t - room.turnStartsAt) / (s.drawTime * 1000);
+        const want = maxRev ? Math.floor(clamp((frac - .35) / .55, 0, 1) * maxRev + (frac >= .35 ? 1 : 0)) : 0;
+        const rev = arr(d.reveal);
+        if (Math.min(want, maxRev) > rev.length && acted !== `hint:${d.tk}:${rev.length}`) {
+          acted = `hint:${d.tk}:${rev.length}`;
+          const left = letters.filter(i => !rev.includes(i));
+          if (left.length) set(G("draw/reveal"), [...rev, pick(left)]);
+        }
+      }
+    }
+    if (room.phase === "d_reveal" && t >= room.revealEndsAt) nextTurn();
   }
   setInterval(tick, 200);
 
-  // ---------- Boot ----------
-  const urlCode = (new URLSearchParams(location.search).get("room") || "").toUpperCase();
-  const savedName = store.get("sg_name");
-  if (urlCode && savedName) joinRoom(urlCode, savedName);
-  else renderHome();
+  /* ---------- boot ---------- */
+  const urlCode = (new URLSearchParams(location.search).get("room") || "").toUpperCase(), savedName = store.get("sg_name");
+  if (urlCode && savedName) joinRoom(urlCode, savedName); else renderHome();
 }
 </script>
 </body>
